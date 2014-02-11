@@ -14,6 +14,10 @@
 #                       0    1      2       3       4        5 
 
 
+# pbpb data
+
+root -l -q -b 'forest2yskim_jetSkim_forestV3_akpu5.C+("forestFiles/pbpb/HiForestPhoton-v7-noDuplicate.root",       "yskimmedFiles/minbiasSkim_HIMinBias_merged_1_1000.root",    40,  "yskim_HiForestPhoton-v7-noDuplicate_akpu5.root",  0, 1)'
+
 
 # pp data 
 root -l -q -b 'forest2yskim_jetSkim_forestV3_akpu5.C+("forestFiles/pp/pp_photonSKimForest_v85.root",       "no minbias", 40,   "yskim_pp_photonSKimForest_v85_jetNoSmearing_akpu5.root",2,0,0)'

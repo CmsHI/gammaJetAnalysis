@@ -14,7 +14,7 @@
 #include <iomanip>
 #include <string>
 #include <TMath.h>
-#include "../../hiForestV3/hiForest.h"
+#include "../../HiForestAnalysisPostHP/hiForest.h"
 #include "../CutAndBinCollection2012.h"
 #include <time.h>
 #include <TRandom3.h>
@@ -27,24 +27,34 @@ static const long MAXTREESIZE = 10000000000;
 
 
 
-void forest2yskim_minbias_forestV3(TString inputFile_="mergedFiles/forest_minbias-HYDJET-START44-V12-Aug29th.root",
-				   std::string outname = "skim_trackJet_minbiasTrackJet_mc.root",
-				   sampleType colli=kPADATA,
+void forest2yskim_minbias_forestV3(TString inputFile_="forestFiles/HiForest4/HiForest_PbPb_MinBias_Track8_Jet5_GR_R_53_LV2B_merged_forest_0.root",
+				   sampleType colli=kHIDATA,
 				   int maxEvent = -1,
-				   bool useGenJetColl = 0
+				   bool useGenJetColl = 0,
+				   TString jetAlgo="akPu3PF"
 				   )
 { 
   
   bool isMC=true;
   if ((colli==kPPDATA)||(colli==kPADATA)||(colli==kHIDATA))
     isMC=false;
-  TString jetAlgo="akPu3PF";
-
-  int seconds = time(NULL);         cout << " time = " <<seconds%10000<< endl;
+  
+   int seconds = time(NULL);  
+  cout << " time = " <<seconds%10000<< endl;
   TRandom3 rand(seconds%10000);
-  TString datafname  = "";
+
+  TString sampleString = "kPPDATA";
+  if (colli==kPADATA) sampleString = "kPADATA";
+  if (colli==kHIDATA) sampleString = "kHIDATA";
+  if (colli==kPPMC) sampleString = "kPPMC";
+  if (colli==kPAMC) sampleString = "kPAMC";
+  if (colli==kHIMC) sampleString = "kHIMC";
 
 
+  TString outname =  inputFile_(0, inputFile_.Last('/')+1) +  "skim_collId_"+ sampleString + "_jetAlgo_"+jetAlgo+"_"+inputFile_(inputFile_.Last('/')+1,200);
+
+  
+  
   HiForest *c;
   if((colli==kPADATA)||(colli==kPAMC)) {
     c = new HiForest(inputFile_.Data(), "forest", cPPb, isMC );
@@ -64,9 +74,14 @@ void forest2yskim_minbias_forestV3(TString inputFile_="mergedFiles/forest_minbia
 
   
   // output file
-  TFile* newfile_data = new TFile(outname.data(),"recreate");
+  TFile* newfile_data = new TFile(outname,"recreate");
    
-  // The track tree removed at the moment 
+  // Track tree retrieved on Feb 11 2014
+  int nTrk;
+  static const int MAXTRK  = 5000;   // This must be  enough.
+  float trkPt[MAXTRK];
+  float trkEta[MAXTRK];
+  float trkPhi[MAXTRK];
  
   // Jet tree
   int nJet;
@@ -94,8 +109,13 @@ void forest2yskim_minbias_forestV3(TString inputFile_="mergedFiles/forest_minbia
     for( int ivz = 1 ; ivz<=nVtxBin ; ivz++) {
       newtreeTrkJet[icent][ivz] = new TTree(Form("trkAndJets_first_cBin2icent%d_ivz%d",icent,ivz),"track and jets");
       newtreeTrkJet[icent][ivz]->SetMaxTreeSize(MAXTREESIZE);
-      newtreeTrkJet[icent][ivz]->Branch("evt",&evt.run,"run/I:evt:cBin:pBin:trig/O:offlSel:noiseFilt:anaEvtSel:vz/F:reweight/F:hf4Pos:hf4Neg:hf4Sum");
-      
+      newtreeTrkJet[icent][ivz]->Branch("evt",&evt.run,"run/I:evt:cBin:pBin:vz/F:vtxCentWeight/F:hf4Pos:hf4Neg:hf4Sum");
+
+      newtreeTrkJet[icent][ivz]->Branch("nTrk",&nTrk,"nTrk/I");
+      newtreeTrkJet[icent][ivz]->Branch("trkPt",trkPt,"trkPt[nTrk]/F");
+      newtreeTrkJet[icent][ivz]->Branch("trkEta",trkEta,"trkEta[nTrk]/F");
+      newtreeTrkJet[icent][ivz]->Branch("trkPhi",trkPhi,"trkPhi[nTrk]/F");
+
       newtreeTrkJet[icent][ivz]->Branch("nJet",&nJet,"nJet/I");
       newtreeTrkJet[icent][ivz]->Branch("jetPt",jetPt,"jetPt[nJet]/F");
       newtreeTrkJet[icent][ivz]->Branch("jetEta",jetEta,"jetEta[nJet]/F");
@@ -118,13 +138,18 @@ void forest2yskim_minbias_forestV3(TString inputFile_="mergedFiles/forest_minbia
   TH1F* hEvtPlnBin = new TH1F("hEvtPlnBin", "", nPlnBin, -PI/2., PI/2.);
   // jet algos                                                                                                     
   Jets* theJet;
-  theJet = &(c->akPu3PF) ;   cout << "Using akPu3PF Jet Algo" << endl<<endl;
+  if ( jetAlgo == "akPu3PF")  {
+    theJet = &(c->akPu3PF) ;   cout << "Using akPu3PF Jet Algo" << endl<<endl;
+  }
+  else if ( jetAlgo == "akVs3PF") {
+    theJet = &(c->akVs3PF) ;   cout << "Using ak3PF Jet Algo, Voronoi Subtraction method" << endl<<endl;
+  } 
+
   
   /// LOOP!!
   int nentries = c->GetEntries();
   if ( maxEvent > 0 ) 
     nentries = maxEvent;
-  int nSelEvt = 0;
   cout << "number of entries = " << nentries << endl;
     
   for (Long64_t jentry=0 ; jentry<nentries;jentry++) {
@@ -150,15 +175,16 @@ void forest2yskim_minbias_forestV3(TString inputFile_="mergedFiles/forest_minbia
 	cout << " Check the pA centrality..  cbin = " << evt.cBin << endl;
     }
     
-    evt.reweight = 1;
-    evt.trig = 0;
-    evt.offlSel = (c->skim.pcollisionEventSelection > 0);
-    evt.noiseFilt = (c->skim.pHBHENoiseFilter > 0);
-    evt.anaEvtSel = c->selectEvent() && evt.trig;
+    evt.vtxCentWeight = 1;
+    //   evt.trig = 0; // dummy variables are removed 
+    //   evt.offlSel = (c->skim.pcollisionEventSelection > 0);
+    //   evt.noiseFilt = (c->skim.pHBHENoiseFilter > 0);
+    //   evt.anaEvtSel = c->selectEvent() && evt.trig;
     evt.vz = c->evt.vz;
-    if ( c->selectEvent() == 0 )
-      continue;
-    nSelEvt++;
+    
+    //   if ( c->selectEvent() == 0 )
+    //   continue;
+    
     // vertex bin and cut!! 
     
     int vzBin = hvz->FindBin(evt.vz)  ;
@@ -167,24 +193,19 @@ void forest2yskim_minbias_forestV3(TString inputFile_="mergedFiles/forest_minbia
       continue;
     
     //////////////////////////////////////////// No track collection at the moment 
-    /*
-      nTrk = 0; 
-      for (int it=0; it < c->track.nTrk; it++ ) { 
-      //if ( c->track.trkPt[it] < trkBoundary )   continue;
-      if ( c->track.highPurity[it] == 0 )
-      continue;   // only high purity high pt tracks and all pixel track
+    nTrk = 0; 
+    for (int it=0; it < c->track.nTrk; it++ ) { 
+      if ( c->track.trkPt[it] < cuttrkPtSkim )   continue;
+      if (  fabs(c->track.trkEta[it]) > cuttrkEtaSkim ) continue;
+      //      if ( c->track.highPurity[it] == 0 )   continue;  // No id cut yet
       trkPt[nTrk]  = c->track.trkPt[it];
       trkEta[nTrk] = c->track.trkEta[it];
       trkPhi[nTrk] = c->track.trkPhi[it]; 
-      if ( trkPt[nTrk] < cuttrkPt ) 
-      continue;
-      if ( fabs(trkEta[nTrk]) > cuttrkEtaSkim ) 
-      continue;
-      trkWeight[nTrk] = c->getTrackCorrection(it);
+      //  trkWeight[nTrk] = c->getTrackCorrection(it);
       nTrk++;
     }
-    */
-
+    
+    
     ///////////// Collection of jets 
     nJet = 0 ;
     
@@ -267,7 +288,6 @@ void forest2yskim_minbias_forestV3(TString inputFile_="mergedFiles/forest_minbia
   
   newfile_data->Write();
   cout << " Done! "<< endl;
-  cout << nSelEvt << " out of " << nentries << " events were selected " << endl;
 }
 
 

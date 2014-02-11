@@ -206,7 +206,7 @@ void forest2yskim_minbias_forestV3(TString inputFile_="forestFiles/HiForest4/HiF
     for (int it=0; it < c->track.nTrk; it++ ) { 
       if ( c->track.trkPt[it] < cuttrkPtSkim )   continue;
       if (  fabs(c->track.trkEta[it]) > cuttrkEtaSkim ) continue;
-      //      if ( c->track.highPurity[it] == 0 )   continue;  // No id cut yet
+      if ( c->track.highPurity[it] == 0 )   continue;  // highpurity cut by default
       trkPt[nTrk]  = c->track.trkPt[it];
       trkEta[nTrk] = c->track.trkEta[it];
       trkPhi[nTrk] = c->track.trkPhi[it]; 

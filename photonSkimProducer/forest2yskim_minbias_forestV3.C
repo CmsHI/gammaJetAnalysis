@@ -31,7 +31,8 @@ void forest2yskim_minbias_forestV3(TString inputFile_="forestFiles/HiForest4/HiF
 				   sampleType colli=kHIDATA,
 				   int maxEvent = -1,
 				   bool useGenJetColl = 0,
-				   TString jetAlgo="akPu3PF"
+				   TString jetAlgo="akPu3PF",
+				   float trkJetRadius = 0.3
 				   )
 { 
   
@@ -82,7 +83,11 @@ void forest2yskim_minbias_forestV3(TString inputFile_="forestFiles/HiForest4/HiF
   float trkPt[MAXTRK];
   float trkEta[MAXTRK];
   float trkPhi[MAXTRK];
- 
+  float trkAsJetPt[MAXTRK];  // associated Jet pT 
+  float trkAsJetEta[MAXTRK];  // associated Jet pT 
+  float trkAsJetPhi[MAXTRK];  // associated Jet pT 
+  float trkAsJetDR[MAXTRK];  // associated Jet pT 
+
   // Jet tree
   int nJet;
   static const int MAXJET  = 200;   // This must be  enough.
@@ -107,7 +112,7 @@ void forest2yskim_minbias_forestV3(TString inputFile_="forestFiles/HiForest4/HiF
   
   for( int icent = 0 ; icent< nCentBins ; icent++) { 
     for( int ivz = 1 ; ivz<=nVtxBin ; ivz++) {
-      newtreeTrkJet[icent][ivz] = new TTree(Form("trkAndJets_first_cBin2icent%d_ivz%d",icent,ivz),"track and jets");
+      newtreeTrkJet[icent][ivz] = new TTree(Form("trkAndJets_first_icent%d_ivz%d",icent,ivz),"track and jets");
       newtreeTrkJet[icent][ivz]->SetMaxTreeSize(MAXTREESIZE);
       newtreeTrkJet[icent][ivz]->Branch("evt",&evt.run,"run/I:evt:cBin:pBin:vz/F:vtxCentWeight/F:hf4Pos:hf4Neg:hf4Sum");
 
@@ -115,6 +120,10 @@ void forest2yskim_minbias_forestV3(TString inputFile_="forestFiles/HiForest4/HiF
       newtreeTrkJet[icent][ivz]->Branch("trkPt",trkPt,"trkPt[nTrk]/F");
       newtreeTrkJet[icent][ivz]->Branch("trkEta",trkEta,"trkEta[nTrk]/F");
       newtreeTrkJet[icent][ivz]->Branch("trkPhi",trkPhi,"trkPhi[nTrk]/F");
+      newtreeTrkJet[icent][ivz]->Branch("trkAsJetPt",trkAsJetPt,"trkAsJetPt[nTrk]/F");
+      newtreeTrkJet[icent][ivz]->Branch("trkAsJetEta",trkAsJetEta,"trkAsJetEta[nTrk]/F");
+      newtreeTrkJet[icent][ivz]->Branch("trkAsJetPhi",trkAsJetPhi,"trkAsJetPhi[nTrk]/F");
+      newtreeTrkJet[icent][ivz]->Branch("trkAsJetDR",trkAsJetDR,"trkAsJetDR[nTrk]/F");
 
       newtreeTrkJet[icent][ivz]->Branch("nJet",&nJet,"nJet/I");
       newtreeTrkJet[icent][ivz]->Branch("jetPt",jetPt,"jetPt[nJet]/F");
@@ -202,10 +211,24 @@ void forest2yskim_minbias_forestV3(TString inputFile_="forestFiles/HiForest4/HiF
       trkEta[nTrk] = c->track.trkEta[it];
       trkPhi[nTrk] = c->track.trkPhi[it]; 
       //  trkWeight[nTrk] = c->getTrackCorrection(it);
+      int assocJetId = matchedJetFinder( theJet, trkEta[nTrk], trkPhi[nTrk], trkJetRadius); // Works only for reco jets
+      if ( assocJetId < 0 )  {
+	trkAsJetPt[nTrk] = -1; 
+	trkAsJetEta[nTrk] = -1; 
+	trkAsJetPhi[nTrk] = -1; 
+	trkAsJetDR[nTrk] = 100; 
+      } 
+      else { 
+	trkAsJetPt[nTrk] = theJet->jtpt[assocJetId];
+	trkAsJetEta[nTrk] = theJet->jteta[assocJetId];
+	trkAsJetPhi[nTrk] = theJet->jtphi[assocJetId];
+	trkAsJetDR[nTrk] =getDR( trkEta[nTrk], trkPhi[nTrk], theJet->jteta[assocJetId], theJet->jtphi[assocJetId]) ;
+      }
+      
       nTrk++;
     }
     
-    
+
     ///////////// Collection of jets 
     nJet = 0 ;
     

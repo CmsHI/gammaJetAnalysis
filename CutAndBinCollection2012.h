@@ -690,194 +690,24 @@ class CutAndBinCollection
 
 };
 
-void CutAndBinCollection::setCuts( int cutOpt ) {
-  purityFname_ = Form("photonPurityCollection2012_cutOption%d.root",cutOpt);
-  centBin_.clear();
-  ptBin_.clear();
-  ptBinAssoc_.clear();
-  jetPtBin_.clear();
 
-
-  if ( cutOpt == 602003) {
-    coneSize_ = 0.3;
-
-    centBin_.clear();
-    centBin_.push_back(0);
-    centBin_.push_back(4);
-    centBin_.push_back(12);
-    centBin_.push_back(20);
-    centBin_.push_back(40);
-
-    ptBin_.push_back(60);
-    ptBin_.push_back(1000);
-
-    jetPtBin_.push_back(20);
-    jetPtBin_.push_back(30);
-    jetPtBin_.push_back(40);
-    jetPtBin_.push_back(50);
-    jetPtBin_.push_back(60);
-    jetPtBin_.push_back(1000);
-
-    ptBinAssoc_.push_back(0.5);
-    ptBinAssoc_.push_back(1000);
-
+int matchedJetFinder(Jets* theJet, float trkEta, float trkPhi, float trkJetRadius) {
+  int jetEntries = theJet->nref;
+  float minDR = 100; 
+  int matchId = -1;
+  for (int ij=0; ij< jetEntries ; ij++) {
+    float theDr = getDR( trkEta, trkPhi,  theJet->jteta[ij], theJet->jtphi[ij] );
+    if ( minDR > theDr ) {
+      minDR = theDr ;
+      matchId = ij;
+    }
   }
 
-  else if ( cutOpt == 500000) {
-    coneSize_ = 0.3;
-    centBin_.clear();
-    centBin_.push_back(0);
-    centBin_.push_back(4);
-    centBin_.push_back(12);
-    centBin_.push_back(20);
-    centBin_.push_back(40);
-
-    ptBin_.push_back(50);
-    ptBin_.push_back(10000);
-
-    jetPtBin_.push_back(20);
-    jetPtBin_.push_back(10000);
-
-    ptBinAssoc_.push_back(0.5);
-    ptBinAssoc_.push_back(1000);
-
-  }
-  else if ( cutOpt == 500020) {
-    coneSize_ = 0.3;
-
-    centBin_.clear();
-    centBin_.push_back(0);
-    centBin_.push_back(4);
-    centBin_.push_back(12);
-    centBin_.push_back(20);
-    centBin_.push_back(40);
-
-    ptBin_.push_back(50);
-    ptBin_.push_back(10000);
-
-    jetPtBin_.push_back(20);
-    jetPtBin_.push_back(10000);
-
-    ptBinAssoc_.push_back(0.5);
-    ptBinAssoc_.push_back(1000);
-
-  }
-  else if ( cutOpt == 500025) {
-    coneSize_ = 0.3;
-
-    centBin_.clear();
-    centBin_.push_back(0);
-    centBin_.push_back(4);
-    centBin_.push_back(12);
-    centBin_.push_back(20);
-    centBin_.push_back(40);
-
-    ptBin_.push_back(50);
-    ptBin_.push_back(10000);
-
-    jetPtBin_.push_back(25);
-    jetPtBin_.push_back(10000);
-
-    ptBinAssoc_.push_back(0.5);
-    ptBinAssoc_.push_back(1000);
-
-  }
-
-  else if ( cutOpt == 500030) {
-    coneSize_ = 0.3;
-
-    centBin_.clear();
-    centBin_.push_back(0);
-    centBin_.push_back(4);
-    centBin_.push_back(12);
-    centBin_.push_back(20);
-    centBin_.push_back(40);
-
-    ptBin_.push_back(50);
-    ptBin_.push_back(10000);
-
-    jetPtBin_.push_back(30);
-    jetPtBin_.push_back(10000);
-
-    ptBinAssoc_.push_back(0.5);
-    ptBinAssoc_.push_back(1000);
-
-  }
-
-  else if ( cutOpt == 603010) {
-    coneSize_ = 0.3;
-
-    centBin_.clear();
-    centBin_.push_back(0);
-    centBin_.push_back(4);
-    centBin_.push_back(12);
-    centBin_.push_back(20);
-    centBin_.push_back(40);
-
-    ptBin_.push_back(60);
-    ptBin_.push_back(10000);
-
-    jetPtBin_.push_back(30);
-    jetPtBin_.push_back(10000);
-
-    ptBinAssoc_.push_back(1);
-    ptBinAssoc_.push_back(2000);
-  }
-
-  else if ( cutOpt == 603011) {
-    coneSize_ = 0.3;
-
-    centBin_.clear();
-    centBin_.push_back(0);
-    centBin_.push_back(4);
-    centBin_.push_back(12);
-    centBin_.push_back(20);
-    centBin_.push_back(40);
-
-    ptBin_.push_back(60);
-    ptBin_.push_back(10000);
-
-    jetPtBin_.push_back(30);
-    jetPtBin_.push_back(10000);
-
-    ptBinAssoc_.push_back(1);
-    ptBinAssoc_.push_back(2);
-    ptBinAssoc_.push_back(4);
-    ptBinAssoc_.push_back(8);
-    ptBinAssoc_.push_back(16);
-    ptBinAssoc_.push_back(1000);
-
-  }
-
-
-
-  else
-    cout << "  we dont have such template option " << endl;
-
-
-
+  if (minDR > trkJetRadius )  // matching fail
+    return -1;
+  else 
+    return matchId;
 }
-
-
-
-
-/*
-float CutAndBinCollection::getHoECut(   float percentBin=false; float et ) {  // 100% centrality used
-float thehoe = 0.1;
-if ( percentBin <= 20 ) {   // should change univHoEnCut  accordingly
-if         ( et <=30 )                thehoe = 0.15;
-else                                  thehoe = 0.1;
-}
-if ( percentBin > 20 ) {
-if         ( et <=30 )                thehoe = 0.1;
-`else                                  thehoe = 0.05;
-}
-
-cout << endl << " centrality = " << percentBin << "%" << "    et = " << et << "     hoeCut = " << thehoe << endl;
-return thehoe;
-}
-
-*/
 
 
 void addCentralityFriend(TTree *tSig, TTree *tData,TCut selectionCut)

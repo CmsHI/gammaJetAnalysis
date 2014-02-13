@@ -696,6 +696,11 @@ int matchedJetFinder(Jets* theJet, float trkEta, float trkPhi, float trkJetRadiu
   float minDR = 100; 
   int matchId = -1;
   for (int ij=0; ij< jetEntries ; ij++) {
+    if ( theJet->jtpt[ij] < cutjetPtSkim )
+      continue;
+    if ( fabs(theJet->jteta[ij]) > cutjetEtaSkim )
+      continue;
+    
     float theDr = getDR( trkEta, trkPhi,  theJet->jteta[ij], theJet->jtphi[ij] );
     if ( minDR > theDr ) {
       minDR = theDr ;

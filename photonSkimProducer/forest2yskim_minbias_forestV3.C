@@ -146,13 +146,13 @@ void forest2yskim_minbias_forestV3(TString inputFile_="forestFiles/HiForest4/HiF
       newtreeTrkJet[icent][ivz]->Branch("trkAsJetDR",trkAsJetDR,"trkAsJetDR[nTrk]/F");
 
       newtreeTrkJet[icent][ivz]->Branch("nmTrk",&nmTrk,"nmTrk/I");
-      newtreeTrkJet[icent][ivz]->Branch("mtrkPt",mtrkPt,"mtrkPt[nmtrk]/F");
-      newtreeTrkJet[icent][ivz]->Branch("mtrkEta",mtrkEta,"mtrkEta[nmtrk]/F");
-      newtreeTrkJet[icent][ivz]->Branch("mtrkPhi",mtrkPhi,"mtrkPhi[nmtrk]/F");
-      newtreeTrkJet[icent][ivz]->Branch("mtrkAsJetPt",mtrkAsJetPt,"mtrkAsJetPt[nmtrk]/F");
-      newtreeTrkJet[icent][ivz]->Branch("mtrkAsJetEta",mtrkAsJetEta,"mtrkAsJetEta[nmtrk]/F");
-      newtreeTrkJet[icent][ivz]->Branch("mtrkAsJetPhi",mtrkAsJetPhi,"mtrkAsJetPhi[nmtrk]/F");
-      newtreeTrkJet[icent][ivz]->Branch("mtrkAsJetDR",mtrkAsJetDR,"mtrkAsJetDR[nmtrk]/F");
+      newtreeTrkJet[icent][ivz]->Branch("mtrkPt",mtrkPt,"mtrkPt[nmTrk]/F");
+      newtreeTrkJet[icent][ivz]->Branch("mtrkEta",mtrkEta,"mtrkEta[nmTrk]/F");
+      newtreeTrkJet[icent][ivz]->Branch("mtrkPhi",mtrkPhi,"mtrkPhi[nmTrk]/F");
+      newtreeTrkJet[icent][ivz]->Branch("mtrkAsJetPt",mtrkAsJetPt,"mtrkAsJetPt[nmTrk]/F");
+      newtreeTrkJet[icent][ivz]->Branch("mtrkAsJetEta",mtrkAsJetEta,"mtrkAsJetEta[nmTrk]/F");
+      newtreeTrkJet[icent][ivz]->Branch("mtrkAsJetPhi",mtrkAsJetPhi,"mtrkAsJetPhi[nmTrk]/F");
+      newtreeTrkJet[icent][ivz]->Branch("mtrkAsJetDR",mtrkAsJetDR,"mtrkAsJetDR[nmTrk]/F");
 
     }
   }
@@ -174,6 +174,7 @@ void forest2yskim_minbias_forestV3(TString inputFile_="forestFiles/HiForest4/HiF
   
   /// LOOP!!
   int nentries = c->GetEntries();
+  //  int nentries = 300;
   if ( maxEvent > 0 ) 
     nentries = maxEvent;
   cout << "number of entries = " << nentries << endl;
@@ -299,6 +300,11 @@ void forest2yskim_minbias_forestV3(TString inputFile_="forestFiles/HiForest4/HiF
       if ( c->evt.hiBin == cMix->evt.hiBin ) 
        	break;   
     }
+    if ( (c->evt.evt) == ( cMix->evt.evt ) ) {
+      cout << " WARNING!!! Could not find the centrlaity matched events" << endl;
+      return;
+    }
+    
     //    cout << "loop counts = " << loopCounter << endl;
     //    cout << "c1 = " << c->evt.hiBin << " c2 = " << cMix->evt.hiBin << endl;
     

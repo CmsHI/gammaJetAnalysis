@@ -691,7 +691,7 @@ class CutAndBinCollection
 };
 
 
-int matchedJetFinder(Jets* theJet, float trkEta, float trkPhi, float trkJetRadius) {
+int matchedJetFinder(Jets* theJet, float trkEta, float trkPhi, float trkJetRadius=drCutTJ) {
   int jetEntries = theJet->nref;
   float minDR = 100; 
   int matchId = -1;

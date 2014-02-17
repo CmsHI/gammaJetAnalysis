@@ -31,8 +31,7 @@ void forest2yskim_minbias_forestV3(TString inputFile_="forestFiles/HiForest4/HiF
 				   sampleType colli=kHIDATA,
 				   int maxEvent = -1,
 				   bool useGenJetColl = 0,
-				   TString jetAlgo="akPu3PF",
-				   float trkJetRadius = 0.3
+				   TString jetAlgo="akPu3PF"
 				   )
 { 
   
@@ -269,7 +268,7 @@ void forest2yskim_minbias_forestV3(TString inputFile_="forestFiles/HiForest4/HiF
       trkEta[nTrk] = c->track.trkEta[it];
       trkPhi[nTrk] = c->track.trkPhi[it]; 
       //  trkWeight[nTrk] = c->getTrackCorrection(it);
-      int assocJetId = matchedJetFinder( theJet, trkEta[nTrk], trkPhi[nTrk], trkJetRadius); // Works only for reco jets
+      int assocJetId = matchedJetFinder( theJet, trkEta[nTrk], trkPhi[nTrk]);
       if ( assocJetId < 0 )  {
 	trkAsJetPt[nTrk] = -1; 
 	trkAsJetEta[nTrk] = -1; 
@@ -316,7 +315,7 @@ void forest2yskim_minbias_forestV3(TString inputFile_="forestFiles/HiForest4/HiF
       mtrkPt[nmTrk]  = cMix->track.trkPt[it];
       mtrkEta[nmTrk] = cMix->track.trkEta[it];
       mtrkPhi[nmTrk] = cMix->track.trkPhi[it]; 
-      int assocJetId = matchedJetFinder( theJet, mtrkEta[nmTrk], mtrkPhi[nmTrk], trkJetRadius); // Works only for reco jets
+      int assocJetId = matchedJetFinder( theJet, mtrkEta[nmTrk], mtrkPhi[nmTrk]);
       if ( assocJetId < 0 )  {
 	mtrkAsJetPt[nmTrk] = -1; 
 	mtrkAsJetEta[nmTrk] = -1; 

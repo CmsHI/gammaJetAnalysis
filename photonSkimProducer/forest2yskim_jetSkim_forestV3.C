@@ -251,13 +251,13 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/pA/pA_photonS
 
   TBranch        *b_jetPtImb;
   TBranch        *b_jetEtaImb;
-  TBranch    *b_jetPhiImb;
-  TBranch           *b_jetSubidImb;
-  TBranch         *b_jetRefPtImb;
-  TBranch           *b_jetRefEtaImb;
-  TBranch         *b_jetRefPhiImb;
-  TBranch           *b_jetRefPartonPtImb;
-  TBranch             *b_jetRefPartonFlvImb;
+  TBranch        *b_jetPhiImb;
+  TBranch        *b_jetSubidImb;
+  TBranch        *b_jetRefPtImb;
+  TBranch        *b_jetRefEtaImb;
+  TBranch        *b_jetRefPhiImb;
+  TBranch        *b_jetRefPartonPtImb;
+  TBranch        *b_jetRefPartonFlvImb;
 
   
   // 3.2. Tracks  
@@ -538,7 +538,7 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/pA/pA_photonS
 	  jetEta[nJet] = theJet->jteta[ij];
 	  jetPhi[nJet] = theJet->jtphi[ij];
 	}
-
+	
 	// Smear phi
 	Double_t newPhi = jetPhi[nJet] ;
 	if( smearingCentBin != -1 )
@@ -568,19 +568,22 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/pA/pA_photonS
 	  // L2L3 correction!
 	  l2l3Corr = getL2L3Corr( colli,  jetPt[nJet], jetEta[nJet], fgaus);
 	}
+	jetPt[nJet] = smeared * l2l3Corr /resCorrection;
+
+
 	// reflect eta! 
 	if ( (colli==kPADATA) && ( evt.run > 211256 ) )  {
 	  jetEta[nJet] = -jetEta[nJet];
 	}
-	jetPt[nJet] = smeared * l2l3Corr /resCorrection;
 
+	// Jet kinematic cuts //////////////////////////////////////////////
 	if ( jetPt[nJet] < cutjetPtSkim) 
 	  continue;
 	if ( fabs( jetEta[nJet] ) > cutjetEtaSkim )
 	  continue;
 	if ( getDR( jetEta[nJet], jetPhi[nJet], gj.photonEta, gj.photonPhi) < 0.5 )
 	  continue;
-
+	///////////////////////////////////////////////////////////////////////////////
 
 	if (jetPt[nJet] >0)
 	  jetDphi[nJet] = getAbsDphi( jetPhi[nJet], gj.photonPhi) ;
@@ -627,35 +630,15 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/pA/pA_photonS
     }
   
     
-    //////// Leading jet kinematics in dphi>7pi/8
+    //////// Leading jet kinematics in dphi>7pi/8   ... No leading jet analysis at the moment.  2014/03/19
     float maxJpt = 0;
     int jetLeadingIndex = -1;
+    gj.lJetPt = -1;
+    gj.lJetEta = 999;
+    gj.lJetPhi = 999;
+    gj.lJetDphi = 0;
+    gj.lJetSubid=  -99;
     
-    for (int ij=0; ij< nJet ; ij++) {
-      if ( jetDphi[ij] < awayRange )  // const float awayRange= PI * 7./8.;
-	continue;
-      if ( fabs( jetEta[ij] ) > cutjetEta )  // double cutjetEta = 1.6;
-	continue;
-      if ( jetPt[ij] > maxJpt) {
-	maxJpt = jetPt[ij] ;
-	jetLeadingIndex = ij;
-      }
-    }
-    if ( jetLeadingIndex > -1 ) {
-      gj.lJetPt = jetPt[jetLeadingIndex];
-      gj.lJetEta = jetEta[jetLeadingIndex];
-      gj.lJetPhi = jetPhi[jetLeadingIndex];
-      gj.lJetDphi =  jetDphi[jetLeadingIndex];
-      gj.lJetSubid=  jetSubid[jetLeadingIndex];
-    }
-    else {
-      gj.lJetPt = -1;
-      gj.lJetEta = 999;
-      gj.lJetPhi = 999;
-      gj.lJetDphi = 0;
-      gj.lJetSubid=  -99;
-    }
-
 
     int nMixing = nMixing1;
     nMjet = 0;
@@ -665,7 +648,7 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/pA/pA_photonS
 
     if ( !doMix )
       iMix = nMixing+1;   // Mixing step will be skipped
-
+    
     while (iMix<nMixing)  {
       loopCounter++;
       if ( loopCounter > nMB[cBin][vzBin]+1) { 
@@ -698,15 +681,13 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/pA/pA_photonS
 	}
 	jetPhiImb[nJet] = normalAngle(newPhi);
 	
-	// smear the jet pT
+	// jet pT residual correction and smearing 
 	Double_t smeared = jetPtImb[it];
 	if( smearingCentBin != -1 )     {
           Double_t smearSigma = getPtSmear( smearingCentBin,  jetPtImb[it]);
           smeared = jetPt[nJet] * rand.Gaus(1, smearSigma);
         }
-	float resCorrection =1. ;
-	float l2l3Corr =1 ;
-
+	float resCorrection =1. ;	float l2l3Corr =1 ;
 	if  (doJetResCorrection)   {
 	  // Correction from MC closure
 	  if   ((colli==kHIDATA)||(colli==kHIMC))
@@ -716,9 +697,9 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/pA/pA_photonS
 	  // L2L3 correction for pp 
           l2l3Corr = getL2L3Corr( colli,  jetPtImb[it], jetEtaImb[it], fgaus);
 	}
+	float smearedCorrected  = smeared *l2l3Corr / resCorrection; 
+	/////////////////////////////////////////////////////////////
 
-
-	float smearedCorrected  = smeared *l2l3Corr / resCorrection; // residual correction
 
 	if ( smearedCorrected < cutjetPtSkim )  // double cutjetPtSkim = 15; Oct 19th
 	  continue;
@@ -730,20 +711,23 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/pA/pA_photonS
 	mJetPt[nMjet]    = smearedCorrected;
 	mJetEta[nMjet]   = jetEtaImb[it];
 	mJetPhi[nMjet]   = jetPhiImb[it];
-	if  ( mJetPt[nMjet]>0 )
-	  mJetDphi[nMjet]  =   getAbsDphi(mJetPhi[nMjet], gj.photonPhi) ;
-	else
-	  mJetDphi[nMjet]=-1;
-
+	if  ( mJetPt[nMjet]>0 )  mJetDphi[nMjet] =  getAbsDphi(mJetPhi[nMjet], gj.photonPhi) ;
+	else            	 mJetDphi[nMjet] = -1;
+	if ( isMC) {
+	  mJetSubidImb[nMjet] = jetSubidImb[it];
+	  mJetRefPtImb[nMjet] = jetRefPtImb[it];
+	  mJetRefEtaImb[nMjet] = jetRefEtaImb[it];
+	  mJetRefPhiImb[nMjet] = jetRefPhiImb[it];
+	  mJetRefPartonPtImb[nMjet] = jetRefPartonPtImb[it];
+	  mJetRefPartonFlvImb[nMjet] = jetRefPartonFlvImb[it];
+	}
 	nMjet++; // < == Important!
       }
-
-
       iMix++;
     }
     if ( noSuchEvent )
       continue;
-
+    
     tgj->Fill();
     newtreeJet->Fill();
     tmixJet->Fill();

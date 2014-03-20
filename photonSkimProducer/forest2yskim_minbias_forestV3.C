@@ -120,7 +120,7 @@ void forest2yskim_minbias_forestV3(TString inputFile_="forestFiles/HiForest4/HiF
     for( int ivz = 1 ; ivz<=nVtxBin ; ivz++) {
       newtreeTrkJet[icent][ivz] = new TTree(Form("trkAndJets_first_icent%d_ivz%d",icent,ivz),"track and jets");
       newtreeTrkJet[icent][ivz]->SetMaxTreeSize(MAXTREESIZE);
-      newtreeTrkJet[icent][ivz]->Branch("evt",&evt.run,"run/I:evt:cBin:pBin:vz/F:vtxCentWeight/F:hf4Pos:hf4Neg:hf4Sum");
+      setEvtBranch( newtreeTrkJet[icent][ivz], evt);
 
       newtreeTrkJet[icent][ivz]->Branch("nJet",&nJet,"nJet/I");
       newtreeTrkJet[icent][ivz]->Branch("jetPt",jetPt,"jetPt[nJet]/F");

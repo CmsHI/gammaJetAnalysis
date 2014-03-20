@@ -38,6 +38,45 @@ float getPpResCorr( float jetPt=0);
 float normalAngle(float phi=0 );
 
 
+// vertex and centrality vtxCentWeighting
+TFile* fWeight = new TFile("../vertexReweightingHistogram_pthatweighted.root");
+
+TH1D* hWeight_vtx_data_pp = (TH1D*)fWeight->Get("vertexHistoData_pp");
+TH1D* hWeight_vtx_mc_pp = (TH1D*)fWeight->Get("vertexHistoMC_pp");
+
+TH1D* hWeight_vtx_data_ppb = (TH1D*)fWeight->Get("vertexHistoData_ppb");
+TH1D* hWeight_vtx_mc_ppb = (TH1D*)fWeight->Get("vertexHistoMC_ppb");
+
+TH1D* hWeight_vtx_data_pbpb = (TH1D*)fWeight->Get("vertexHistoData_pbpb");
+TH1D* hWeight_vtx_mc_pbpb = (TH1D*)fWeight->Get("vertexHistoMC_pbpb");
+TH1D* hWeight_cent_data_pbpb = (TH1D*)fWeight->Get("centBinHistoData_pbpb");
+TH1D* hWeight_cent_mc_pbpb = (TH1D*)fWeight->Get("centBinHistoMC_pbpb");
+
+// L2L3 correction
+TFile* fL2L3pp = new TFile("../corrL2L3/Casym_pp_double_hcalbins_algo_ak3PF_pt100_140_jet80_alphahigh_20_phicut250.root");
+TH1D * c_etapp=(TH1D*)fL2L3pp->Get("C_asym");
+TF1* fptpp = new TF1("fptpp","1-[0]/pow(x,[1])",20,300);
+fptpp->SetParameters(0.06971,0.8167);
+
+TFile* fL2L3pA = new TFile("../corrL2L3/Casym_pPb_double_hcalbins_algo_akPu3PF_pt100_140_jet80_alphahigh_20_phicut250.root");
+TH1D * c_etapA=(TH1D*)fL2L3pA->Get("C_asym");
+TF1* fptpA = new TF1("fptpA","1-[0]/pow(x,[1])",20,300);
+fptpA->SetParameters(0.3015, 0.8913);
+
+TFile* fL2L3Ap = new TFile("../corrL2L3/Casym_Pbp_double_hcalbins_algo_akPu3PF_pt100_140_jet80_alphahigh_20_phicut250.root");
+TH1D * c_etaAp=(TH1D*)fL2L3Ap->Get("C_asym");
+TF1* fptAp = new TF1("fptAp","1-[0]/pow(x,[1])",20,300);
+fptAp->SetParameters(0.3015, 0.8913);
+
+// pA MC
+TF1 * fgaus=new TF1("fgaus_pA","gaus(0)",-20,20);
+fgaus->SetParameters(1,0,1);
+TF1 * fsmear_pA = new TF1("fsmear_pA","[0]/pow(x,[1])",50,300);
+fsmear_pA->SetParameters(1.052,0.5261);
+
+void drawL2L3Correciton(); 
+
+
 void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/pA/pA_photonSkimForest_v85_skimPhotonPt50_eta1.5.root",
 				   std::string MinbiasFname = "skim_trackJet_minbiasTrackJet_mc.root",
 				   float cutphotonPt  = 35,  // default value dropped to 35GeV  for later photon energy smearing/scaling
@@ -47,7 +86,7 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/pA/pA_photonS
 				   bool doJetResCorrection = 1,  // = L2L3 * MC nonclosure correction  jet energy correction is done by default from Oct 19th (YS)
 				   int smearingCentBin = -1, //0=0-10%, 1=10-30%, 2=30-50%, 3=50-100%, 4=0-30%, 5=30-100%  : Jet pT and phi smearing!
 				   bool useGenJetColl = 0
-  )
+				   )
 {
   bool isMC=true;
   if ((colli==kPPDATA)||(colli==kPADATA)||(colli==kHIDATA))
@@ -80,59 +119,7 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/pA/pA_photonS
   
   c->InitTree();
   
-
-  // vertex and centrality vtxCentWeighting
-  TFile* fWeight = new TFile("../vertexReweightingHistogram_pthatweighted.root");
-
-  TH1D* hWeight_vtx_data_pp = (TH1D*)fWeight->Get("vertexHistoData_pp");
-  TH1D* hWeight_vtx_mc_pp = (TH1D*)fWeight->Get("vertexHistoMC_pp");
-
-  TH1D* hWeight_vtx_data_ppb = (TH1D*)fWeight->Get("vertexHistoData_ppb");
-  TH1D* hWeight_vtx_mc_ppb = (TH1D*)fWeight->Get("vertexHistoMC_ppb");
-
-  TH1D* hWeight_vtx_data_pbpb = (TH1D*)fWeight->Get("vertexHistoData_pbpb");
-  TH1D* hWeight_vtx_mc_pbpb = (TH1D*)fWeight->Get("vertexHistoMC_pbpb");
-  TH1D* hWeight_cent_data_pbpb = (TH1D*)fWeight->Get("centBinHistoData_pbpb");
-  TH1D* hWeight_cent_mc_pbpb = (TH1D*)fWeight->Get("centBinHistoMC_pbpb");
-  
-  
-  
-  
-  // L2L3 correction
-  TFile* fL2L3pp = new TFile("../corrL2L3/Casym_pp_double_hcalbins_algo_ak3PF_pt100_140_jet80_alphahigh_20_phicut250.root");
-  TH1D * c_etapp=(TH1D*)fL2L3pp->Get("C_asym");
-  TF1* fptpp = new TF1("fptpp","1-[0]/pow(x,[1])",20,300);
-  fptpp->SetParameters(0.06971,0.8167);
-  
-  TFile* fL2L3pA = new TFile("../corrL2L3/Casym_pPb_double_hcalbins_algo_akPu3PF_pt100_140_jet80_alphahigh_20_phicut250.root");
-  TH1D * c_etapA=(TH1D*)fL2L3pA->Get("C_asym");
-  TF1* fptpA = new TF1("fptpA","1-[0]/pow(x,[1])",20,300);
-  fptpA->SetParameters(0.3015, 0.8913);
-
-  TFile* fL2L3Ap = new TFile("../corrL2L3/Casym_Pbp_double_hcalbins_algo_akPu3PF_pt100_140_jet80_alphahigh_20_phicut250.root");
-  TH1D * c_etaAp=(TH1D*)fL2L3Ap->Get("C_asym");
-  TF1* fptAp = new TF1("fptAp","1-[0]/pow(x,[1])",20,300);
-  fptAp->SetParameters(0.3015, 0.8913);
-
-  // pA MC
-  TF1 * fgaus=new TF1("fgaus_pA","gaus(0)",-20,20);
-  fgaus->SetParameters(1,0,1);
-  TF1 * fsmear_pA = new TF1("fsmear_pA","[0]/pow(x,[1])",50,300);
-  fsmear_pA->SetParameters(1.052,0.5261);
-
-
-  /* 
-     TCanvas* c11 = new TCanvas("c11","",1200,400);   // valiation of smearing factors
-     c11->Divide(3,1);
-     c11->cd(1);
-     c_etapp->Draw();
-     c11->cd(2);
-     c_etaAp->Draw();
-     c11->cd(3);
-     c_etapA->Draw();
-     c11->SaveAs("f1.gif");
-  */
-
+  drawL2L3Correciton();
 
   // Create a new root file
   TFile* newfile_data = new TFile(outname.data(),"recreate");
@@ -319,14 +306,11 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/pA/pA_photonS
   TTree *tgj;
   tgj = new TTree("tgj","gamma jet tree");
   tgj->SetMaxTreeSize(MAXTREESIZE);
-  tgj->Branch("evt",&evt.run,"run/I:evt:cBin:pBin:trig/O:offlSel:noiseFilt:anaEvtSel:vz/F:vtxCentWeight/F:hf4Pos:hf4Neg:hf4Sum:ptHat:ptHatWeight");
-  tgj->Branch("lpho",&gj.photonEt,"photonEt/F:photonRawEt:photonEta:photonPhi:hovere:r9:sigmaIetaIeta:sumIso:genIso:genPhotonEt:genMomId/I:lJetPt/F:lJetEta:lJetPhi:lJetDphi:lJetSubid/I");
-  tgj->Branch("isolation",&isol.cc1,"cc1:cc2:cc3:cc4:cc5:cr1:cr2:cr3:cr4:cr5:ct1PtCut20:ct2PtCut20:ct3PtCut20:ct4PtCut20:ct5PtCut20:ecalIso:hcalIso:trackIso");  // ecalIso,hcalIso,trackIso are the pp style isolation
+  setEvtBranch(tgj, evt);   setPhotonBranch(tgj, gj);   setIsolBranch(tgj.isol);
 
-
-  float vzCut = vtxCutPhotonAna;
-  TH1F* hvz = new TH1F("hvz","",nVtxBin,-vzCut,vzCut);
-  // event plane hitogram
+  // Vertex
+  TH1F* hvz = new TH1F("hvz","",nVtxBin,-vtxCutPhotonAna,vtxCutPhotonAna);
+  // Event Plane
   TH1F* hEvtPlnBin = new TH1F("hEvtPlnBin", "", nPlnBin, -PI/2., PI/2.);
   // jet algos
   Jets* theJet;
@@ -816,3 +800,16 @@ float  getL2L3Corr( sampleType colli, float jetPt, float jetEta, TF1* fgaus) {
   
   return l2l3Corr;
 }
+
+void drawL2L3Correciton() {
+  TCanvas* c11 = new TCanvas("c11","",1200,400);   // valiation of smearing factors
+  c11->Divide(3,1);
+  c11->cd(1);
+  c_etapp->Draw();
+  c11->cd(2);
+  c_etaAp->Draw();
+  c11->cd(3);
+  c_etapA->Draw();
+  c11->SaveAs("f1.gif");
+}
+

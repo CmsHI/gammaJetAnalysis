@@ -504,7 +504,7 @@ int ycolorEt[9]= {0,1,2,4,8,20,1,1,1};
 const int theEvtPlNumber = 21;
 
 
-int nCentBinSkim = 40;
+int nCentBinSkim = 200;
 
 int nCentBinSkimPA = 16;
 int getHfBin( float hf4Sum=-1 ) {

@@ -108,7 +108,7 @@ void forest2yskim_minbias_forestV3(TString inputFile_="forestFiles/HiForest4/HiF
   int  jetRefPartonFlv[MAXJET];
 
   EvtSel evt;
-  TTree* newtreeTrkJet[100][nVtxBin+1];
+  TTree* newtreeTrkJet[200][nVtxBin+1];
   
   int nCentBins =  nCentBinSkim;
   if ((colli==kPADATA)||(colli==kPAMC)) {

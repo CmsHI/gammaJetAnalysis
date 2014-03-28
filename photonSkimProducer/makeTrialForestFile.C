@@ -27,25 +27,26 @@ static const long MAXTREESIZE = 10000000000;
 
 
 
-void makeTrialForestFile(int nMax= 1000){ 
+void makeTrialForestFile(int nMax= 500){ 
   //collisionType
-  TString inputFile_="/home/jazzitup/forestFiles/pp/merged_allQCDPhoton30_50_80_120_CMSSW538HIp2.root";
-  TString outname = Form("merged_allQCDPhoton%dto%d_genPtCut%d_CMSSW538HIp2.root",ptHatCut1,ptHatCut2,genPhotonPtCut);
+  collisionType cMode = cPbPb;
+  TString inputFile_="forestFiles/0.root";
+  TString outname = "0_1000files_pbpb_minbiasData.root";
   
   
   // start from here
   // path length histogram
   
   HiForest * t;
-  t = new HiForest(inputFile_.Data(),"",colli);
+  t = new HiForest(inputFile_.Data(),"",cMode);
    
   t->SetOutputFile(outname.Data());
   // LOOP!!
   t->InitTree();
 
-  for (Long64_t jentry = 0 ; jentry < mMax ; jentry++) {
-    if (jentry% 10000 == 0)  {
-      cout <<jentry<<" / "<<nentries<<" "<<setprecision(2)<<(double)jentry/nentries*100<<endl;
+  for (Long64_t jentry = 0 ; jentry < nMax ; jentry++) {
+    if (jentry% 1000 == 0)  {
+      cout <<jentry<<" / "<<nMax<<" "<<setprecision(2)<<(double)jentry/nMax*100<<endl;
     }
     t->GetEntry(jentry);
     t->FillOutput();

@@ -27,7 +27,7 @@ static const long MAXTREESIZE = 10000000000;
 
 
 
-void forest2yskim_minbias_tracks(TString inputFile_="forestFiles/HiForest4/HiForest_PbPb_MinBias_Track8_Jet5_GR_R_53_LV2B_merged_forest_0.root",
+void forest2yskim_minbias_tracks(TString inputFile_="forestFiles/HiForest4/HIMinBias2011_GR_R_53_LV6_CMSSW_5_3_16_Forest_Track8_Jet21_0.root",
 				   sampleType colli=kHIDATA,
 				   int maxEvent = -1
 				   )
@@ -70,6 +70,8 @@ void forest2yskim_minbias_tracks(TString inputFile_="forestFiles/HiForest4/HiFor
   float trkPt[MAXTRK];
   float trkEta[MAXTRK];
   float trkPhi[MAXTRK];
+  int   trkPurity[MAXTRK];
+  int   trkAlgo[MAXTRK];
 
   EvtSel evt;
   TTree* newtreeTrkJet[200][nVtxBin+1];
@@ -91,6 +93,8 @@ void forest2yskim_minbias_tracks(TString inputFile_="forestFiles/HiForest4/HiFor
       newtreeTrkJet[icent][ivz]->Branch("trkPt",trkPt,"trkPt[nTrk]/F");
       newtreeTrkJet[icent][ivz]->Branch("trkEta",trkEta,"trkEta[nTrk]/F");
       newtreeTrkJet[icent][ivz]->Branch("trkPhi",trkPhi,"trkPhi[nTrk]/F");
+      newtreeTrkJet[icent][ivz]->Branch("trkPurity",trkPurity,"trkPurity[nTrk]/I");
+      newtreeTrkJet[icent][ivz]->Branch("trkAlgo",trkAlgo,"trkAlgo[nTrk]/I");
 
     } 
   }
@@ -123,7 +127,7 @@ void forest2yskim_minbias_tracks(TString inputFile_="forestFiles/HiForest4/HiFor
     evt.cBin = -99;
     evt.pBin   = -99 ;
     if ((colli==kHIDATA)||(colli==kHIMC))   {
-      evt.cBin = c->evt.hiBin;
+      evt.cBin = getCbinFrom200(c->evt.hiBin);
       evt.pBin   = hEvtPlnBin->FindBin( c->evt.hiEvtPlanes[theEvtPlNumber] ) ;
     }
     else if ((colli==kPADATA)||(colli==kPAMC))   {
@@ -146,10 +150,11 @@ void forest2yskim_minbias_tracks(TString inputFile_="forestFiles/HiForest4/HiFor
     for (int it=0; it < c->track.nTrk; it++ ) { 
       if ( c->track.trkPt[it] < cuttrkPtSkim )   continue;
       if (  fabs(c->track.trkEta[it]) > cuttrkEtaSkim ) continue;
-      if ( c->track.highPurity[it] == 0 )   continue;  // highpurity cut by default
       trkPt[nTrk]  = c->track.trkPt[it];
       trkEta[nTrk] = c->track.trkEta[it];
       trkPhi[nTrk] = c->track.trkPhi[it]; 
+      trkPurity[nTrk] = c->track.highPurity[it];
+      trkPhi[nTrk] = c->track.trkAlgo[it];
       
       nTrk++;
     }

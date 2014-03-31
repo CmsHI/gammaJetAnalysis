@@ -504,9 +504,35 @@ int ycolorEt[9]= {0,1,2,4,8,20,1,1,1};
 const int theEvtPlNumber = 21;
 
 
-int nCentBinSkim = 200;
+int nCentBinSkim = 22;
 
 int nCentBinSkimPA = 16;
+
+int getCbinFrom200( int hibin = -1 ){ 
+  if ( (hibin < 0)||(hibin>199) ) {
+    cout << " hiBin = " << hibin<<"   not defined"<< endl;
+    return -1 ;
+  }
+  if ( hibin < 5) return hibin;
+  else if ( hibin < 10 )     return 5;
+  else if ( hibin < 15 )     return 6;
+  else if ( hibin < 20 )     return 7;
+  else if ( hibin < 25 )     return 8;
+  else if ( hibin < 30 )     return 9;
+  else if ( hibin < 35 )     return 10;
+  else if ( hibin < 40 )     return 11;
+  else if ( hibin < 50 )     return 12;
+  else if ( hibin < 60 )     return 13;
+  else if ( hibin < 70 )     return 14;
+  else if ( hibin < 80 )     return 15;
+  else if ( hibin < 90 )     return 16;
+  else if ( hibin < 100 )    return 17;
+  else if ( hibin < 120 )    return 18;
+  else if ( hibin < 140 )    return 19;
+  else if ( hibin < 160 )    return 20;
+  else if ( hibin < 200 )    return 21;
+}
+
 int getHfBin( float hf4Sum=-1 ) {
   if ( hf4Sum < -1 )   return -1;
   else if ( hf4Sum < 5 )   return 0;

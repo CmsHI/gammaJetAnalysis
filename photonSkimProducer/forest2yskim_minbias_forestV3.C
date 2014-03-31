@@ -27,9 +27,10 @@ static const long MAXTREESIZE = 10000000000;
 
 
 
-void forest2yskim_minbias_forestV3(TString inputFile_="forestFiles/HiForest4/HiForest_PbPb_MinBias_Track8_Jet5_GR_R_53_LV2B_merged_forest_0.root",
+void forest2yskim_minbias_forestV3(TString inputFile_="forestFiles/HiForest4/HIMinBias2011_GR_R_53_LV6_CMSSW_5_3_16_Forest_Track8_Jet21_0.root",
+				   TString inputFileTrack="forestFiles/HiForest4/trackSkim_collId_kHIDATA_HIMinBias2011_GR_R_53_LV6_CMSSW_5_3_16_Forest_Track8_Jet21_0.root",
 				   sampleType colli=kHIDATA,
-				   int maxEvent = -1,
+				   int maxEvent = 1000,
 				   bool useGenJetColl = 0,
 				   TString jetAlgo="akPu3PF"
 				   )
@@ -53,6 +54,7 @@ void forest2yskim_minbias_forestV3(TString inputFile_="forestFiles/HiForest4/HiF
 
   TString outname =  inputFile_(0, inputFile_.Last('/')+1) +  "skim_collId_"+ sampleString + "_jetAlgo_"+jetAlgo+"_"+inputFile_(inputFile_.Last('/')+1,200);
 
+
   
   
   HiForest *c;
@@ -65,21 +67,18 @@ void forest2yskim_minbias_forestV3(TString inputFile_="forestFiles/HiForest4/HiF
   }
   c->InitTree();
   
-  // Second forest files for track mixing 
-  HiForest *cMix;   
-  if ((colli==kHIDATA)||(colli==kHIMC))    {
-    cMix = new HiForest(inputFile_.Data(), "forest", cPbPb, isMC);
-    cMix->InitTree();
-  }
+  
   // output file
   TFile* newfile_data = new TFile(outname,"recreate");
    
   // Track tree retrieved on Feb 11 2014
   int nTrk;
-  static const int MAXTRK  = 5000;   // This must be  enough.
+  static const int MAXTRK  = 10000;   // This must be  enough.
   float trkPt[MAXTRK];
   float trkEta[MAXTRK];
   float trkPhi[MAXTRK];
+  int   trkPurity[MAXTRK];
+  int    trkAlgo[MAXTRK];
   float trkAsJetPt[MAXTRK];  // associated Jet pT 
   float trkAsJetEta[MAXTRK];  // associated Jet pT 
   float trkAsJetPhi[MAXTRK];  // associated Jet pT 
@@ -89,6 +88,8 @@ void forest2yskim_minbias_forestV3(TString inputFile_="forestFiles/HiForest4/HiF
   float mtrkPt[MAXTRK];
   float mtrkEta[MAXTRK];
   float mtrkPhi[MAXTRK];
+  int  mtrkPurity[MAXTRK];
+  int   mtrkAlgo[MAXTRK];
   float mtrkAsJetPt[MAXTRK];  // associated Jet pT 
   float mtrkAsJetEta[MAXTRK];  // associated Jet pT 
   float mtrkAsJetPhi[MAXTRK];  // associated Jet pT 
@@ -115,13 +116,13 @@ void forest2yskim_minbias_forestV3(TString inputFile_="forestFiles/HiForest4/HiF
     nCentBins = nCentBinSkimPA;
   }
   
-  
+    
   for( int icent = 0 ; icent< nCentBins ; icent++) { 
     for( int ivz = 1 ; ivz<=nVtxBin ; ivz++) {
-      newtreeTrkJet[icent][ivz] = new TTree(Form("trkAndJets_first_icent%d_ivz%d",icent,ivz),"track and jets");
+      newtreeTrkJet[icent][ivz] = new TTree(Form("trkAndJets_second_icent%d_ivz%d",icent,ivz),"track and jets");
       newtreeTrkJet[icent][ivz]->SetMaxTreeSize(MAXTREESIZE);
       setEvtBranch( newtreeTrkJet[icent][ivz], evt);
-
+      
       newtreeTrkJet[icent][ivz]->Branch("nJet",&nJet,"nJet/I");
       newtreeTrkJet[icent][ivz]->Branch("jetPt",jetPt,"jetPt[nJet]/F");
       newtreeTrkJet[icent][ivz]->Branch("jetEta",jetEta,"jetEta[nJet]/F");
@@ -134,21 +135,25 @@ void forest2yskim_minbias_forestV3(TString inputFile_="forestFiles/HiForest4/HiF
 	newtreeTrkJet[icent][ivz]->Branch("refPartonPt",jetRefPartonPt,"refPartonPt[nJet]/F");
 	newtreeTrkJet[icent][ivz]->Branch("refPartonFlv",jetRefPartonFlv,"refPartonFlv[nJet]/I");
       }
-
+      
       newtreeTrkJet[icent][ivz]->Branch("nTrk",&nTrk,"nTrk/I");
       newtreeTrkJet[icent][ivz]->Branch("trkPt",trkPt,"trkPt[nTrk]/F");
       newtreeTrkJet[icent][ivz]->Branch("trkEta",trkEta,"trkEta[nTrk]/F");
       newtreeTrkJet[icent][ivz]->Branch("trkPhi",trkPhi,"trkPhi[nTrk]/F");
+      newtreeTrkJet[icent][ivz]->Branch("trkPurity",trkPurity,"trkPurity[nTrk]/I");
+      newtreeTrkJet[icent][ivz]->Branch("trkAlgo",trkAlgo,"trkAlgo[nTrk]/F");
       newtreeTrkJet[icent][ivz]->Branch("trkAsJetPt",trkAsJetPt,"trkAsJetPt[nTrk]/F");
       newtreeTrkJet[icent][ivz]->Branch("trkAsJetEta",trkAsJetEta,"trkAsJetEta[nTrk]/F");
       newtreeTrkJet[icent][ivz]->Branch("trkAsJetPhi",trkAsJetPhi,"trkAsJetPhi[nTrk]/F");
       newtreeTrkJet[icent][ivz]->Branch("trkAsJetDR",trkAsJetDR,"trkAsJetDR[nTrk]/F");
-
+      
       if ((colli==kHIDATA)||(colli==kHIMC))    { 
 	newtreeTrkJet[icent][ivz]->Branch("nmTrk",&nmTrk,"nmTrk/I");
 	newtreeTrkJet[icent][ivz]->Branch("mtrkPt",mtrkPt,"mtrkPt[nmTrk]/F");
 	newtreeTrkJet[icent][ivz]->Branch("mtrkEta",mtrkEta,"mtrkEta[nmTrk]/F");
 	newtreeTrkJet[icent][ivz]->Branch("mtrkPhi",mtrkPhi,"mtrkPhi[nmTrk]/F");
+	newtreeTrkJet[icent][ivz]->Branch("mtrkPurity",mtrkPurity,"mtrkPurity[nmTrk]/I");
+	newtreeTrkJet[icent][ivz]->Branch("mtrkAlgo",mtrkAlgo,"mtrkAlgo[nmTrk]/F");
 	newtreeTrkJet[icent][ivz]->Branch("mtrkAsJetPt",mtrkAsJetPt,"mtrkAsJetPt[nmTrk]/F");
 	newtreeTrkJet[icent][ivz]->Branch("mtrkAsJetEta",mtrkAsJetEta,"mtrkAsJetEta[nmTrk]/F");
 	newtreeTrkJet[icent][ivz]->Branch("mtrkAsJetPhi",mtrkAsJetPhi,"mtrkAsJetPhi[nmTrk]/F");
@@ -156,13 +161,58 @@ void forest2yskim_minbias_forestV3(TString inputFile_="forestFiles/HiForest4/HiF
       }
     }
   }
+
+  // tracks for the seoncd minbias track skim.
+  EvtSel evtImb;
+  TBranch        *b_evt;
+  Int_t           nTrkImb;
+  Float_t         trkPtImb[MAXTRK];
+  Float_t         trkEtaImb[MAXTRK];
+  Float_t         trkPhiImb[MAXTRK];
+  int          trkPurityImb[MAXTRK];
+  int          trkAlgoImb[MAXTRK];
+  TBranch        *b_nTrkImb;
+  TBranch        *b_trkPtImb;
+  TBranch        *b_trkEtaImb;
+  TBranch        *b_trkPhiImb;
+  TBranch        *b_trkPurityImb;
+  TBranch        *b_trkAlgoImb;
   
+  TChain   *tjmbImb[200][nVtxBin+1];
+  int nMB[200][nVtxBin+1];
+  int mbItr[200][nVtxBin+1];
+  
+  if ( inputFileTrack != "" ) { 
+    for( int icent = 0 ; icent< nCentBins ; icent++) {
+      for( int ivz = 1 ; ivz<=nVtxBin ; ivz++) {
+	tjmbImb[icent][ivz] = new TChain(Form("trkAndJets_first_icent%d_ivz%d",icent,ivz));
+	tjmbImb[icent][ivz]->Add(inputFileTrack.Data());
+	tjmbImb[icent][ivz]->SetBranchAddress("evt", &evtImb,&b_evt);
+	
+	tjmbImb[icent][ivz]->SetBranchAddress("nTrk",   &nTrkImb,   &b_nTrkImb);
+	tjmbImb[icent][ivz]->SetBranchAddress("trkPt",  &trkPtImb,  &b_trkPtImb);
+	tjmbImb[icent][ivz]->SetBranchAddress("trkEta", &trkEtaImb, &b_trkEtaImb);
+	tjmbImb[icent][ivz]->SetBranchAddress("trkPhi", &trkPhiImb, &b_trkPhiImb);
+	tjmbImb[icent][ivz]->SetBranchAddress("trkPurity", &trkPurityImb, &b_trkPurityImb);
+	tjmbImb[icent][ivz]->SetBranchAddress("trkAlgo", &trkAlgoImb, &b_trkAlgoImb);
+
+	nMB[icent][ivz] = tjmbImb[icent][ivz]->GetEntries();
+	cout << "number of evetns in (icent = " << icent << ", ivtxZ = "<< ivz << ")  = " << nMB[icent][ivz] << endl;
+        int primeSeed = rand.Integer(37359); // 37357 is an arbitrary prime number set by YS March 17th 2014
+        mbItr[icent][ivz] = primeSeed%(nMB[icent][ivz]);
+        cout <<" initial itr = " << mbItr[icent][ivz] << endl;
+	tjmbImb[icent][ivz]->GetEntry(mbItr[icent][ivz]);
+      }
+    }
+  }
   // vertex histogram 
   float vzCut = vtxCutPhotonAna;
   TH1F* hvz = new TH1F("hvz","",nVtxBin,-vzCut,vzCut);
   // event plane hitogram
   TH1F* hEvtPlnBin = new TH1F("hEvtPlnBin", "", nPlnBin, -PI/2., PI/2.);
-  // jet algos                                                                                                     
+  // jet algos                                                               
+  
+             
   Jets* theJet;
   if ( jetAlgo == "akPu3PF")  {
     theJet = &(c->akPu3PF) ;   cout << "Using akPu3PF Jet Algo" << endl<<endl;
@@ -170,7 +220,7 @@ void forest2yskim_minbias_forestV3(TString inputFile_="forestFiles/HiForest4/HiF
   else if ( jetAlgo == "akVs3PF") {
     theJet = &(c->akVs3PF) ;   cout << "Using ak3PF Jet Algo, Voronoi Subtraction method" << endl<<endl;
   } 
-
+  
   
   /// LOOP!!
   int nentries = c->GetEntries();
@@ -178,9 +228,9 @@ void forest2yskim_minbias_forestV3(TString inputFile_="forestFiles/HiForest4/HiF
   if ( maxEvent > 0 ) 
     nentries = maxEvent;
   cout << "number of entries = " << nentries << endl;
-    
+  
   for (Long64_t jentry=0 ; jentry<nentries;jentry++) {
-    if (jentry% 100 == 0)  {
+    if (jentry% 1000 == 0)  {
       cout <<jentry<<" / "<<nentries<<" "<<setprecision(2)<<(double)jentry/nentries*100<<endl;
     }
     c->GetEntry(jentry);
@@ -193,7 +243,7 @@ void forest2yskim_minbias_forestV3(TString inputFile_="forestFiles/HiForest4/HiF
     evt.cBin = -99;
     evt.pBin   = -99 ;
     if ((colli==kHIDATA)||(colli==kHIMC))   {
-      evt.cBin = c->evt.hiBin;
+      evt.cBin = getCbinFrom200(c->evt.hiBin);
       evt.pBin   = hEvtPlnBin->FindBin( c->evt.hiEvtPlanes[theEvtPlNumber] ) ;
     }
     else if ((colli==kPADATA)||(colli==kPAMC))   {
@@ -205,12 +255,13 @@ void forest2yskim_minbias_forestV3(TString inputFile_="forestFiles/HiForest4/HiF
     evt.vtxCentWeight = 1;
     evt.vz = c->evt.vz;
     
+    int cBin = evt.cBin; 
     // vertex bin and cut!! 
     int vzBin = hvz->FindBin(evt.vz)  ;
     hvz->Fill(evt.vz)  ;
     if ( (vzBin<1) || ( vzBin > nVtxBin) ) 
       continue;
-
+    
     ///////////// Collection of jets  /////////////////////////////////////////////
     nJet = 0 ;
     int jetEntries = 0;
@@ -234,7 +285,7 @@ void forest2yskim_minbias_forestV3(TString inputFile_="forestFiles/HiForest4/HiF
 	continue;
       if ( fabs( jetEta[nJet] ) > cutjetEtaSkim )
         continue;
-
+      
       if ( (colli==kPADATA) && ( evt.run > 211256 ) )  {
         jetEta[nJet] = -jetEta[nJet] ; 
       }
@@ -264,10 +315,11 @@ void forest2yskim_minbias_forestV3(TString inputFile_="forestFiles/HiForest4/HiF
     for (int it=0; it < c->track.nTrk; it++ ) { 
       if ( c->track.trkPt[it] < cuttrkPtSkim )   continue;
       if (  fabs(c->track.trkEta[it]) > cuttrkEtaSkim ) continue;
-      if ( c->track.highPurity[it] == 0 )   continue;  // highpurity cut by default
       trkPt[nTrk]  = c->track.trkPt[it];
       trkEta[nTrk] = c->track.trkEta[it];
       trkPhi[nTrk] = c->track.trkPhi[it]; 
+      trkPurity[nTrk] = c->track.highPurity[it]; 
+      trkAlgo[nTrk] = c->track.trkAlgo[it]; 
       //  trkWeight[nTrk] = c->getTrackCorrection(it);
       int assocJetId = matchedJetFinder( theJet, trkEta[nTrk], trkPhi[nTrk]);
       if ( assocJetId < 0 )  {
@@ -285,32 +337,35 @@ void forest2yskim_minbias_forestV3(TString inputFile_="forestFiles/HiForest4/HiF
       
       nTrk++;
     }
-
+    
     ///////////////////////////// background tracks //////////////////////////////
     // Step 1.  Find the centrality matched events 
-    if ((colli==kHIDATA)||(colli==kHIMC))    {
-      
-      for ( int offset=1; offset<= nentries ; offset++) {
-	int i2 = jentry+offset;
-	if ( i2>= nentries) 
-	  i2 = i2 - nentries;
-	cMix->GetEntry(i2);
-	
-	if ( c->evt.hiBin == cMix->evt.hiBin ) 
-	  break;   
+    if ( inputFileTrack != "" )  {   
+      bool findFlag = false;
+      for ( int ie = 1 ; ie<=nMB[cBin][vzBin] ; ie++) { 
+	mbItr[cBin][vzBin] = mbItr[cBin][vzBin]++;
+	if ( mbItr[cBin][vzBin] == nMB[cBin][vzBin] ) 
+	  mbItr[cBin][vzBin] = mbItr[cBin][vzBin] -  nMB[cBin][vzBin] ; 
+	tjmbImb[cBin][vzBin]->GetEntry(mbItr[cBin][vzBin]);
+	if ( c->evt.evt == evtImb.evt ) // Identical event
+	  continue;
+	// OK we found the matched event
+	findFlag = true;
+	break;
       }
-      if ( (c->evt.evt) == ( cMix->evt.evt ) ) {
+      if (!findFlag) { 
 	cout << " WARNING!!! Could not find the centrlaity matched events" << endl;
 	return;
       }
       nmTrk = 0; 
-      for (int it=0; it < cMix->track.nTrk; it++ ) { 
-	if ( cMix->track.trkPt[it] < cuttrkPtSkim )   continue;
-	if (  fabs(cMix->track.trkEta[it]) > cuttrkEtaSkim ) continue;
-	if ( cMix->track.highPurity[it] == 0 )   continue;  // highpurity cut by default
-	mtrkPt[nmTrk]  = cMix->track.trkPt[it];
-	mtrkEta[nmTrk] = cMix->track.trkEta[it];
-	mtrkPhi[nmTrk] = cMix->track.trkPhi[it]; 
+      for (int it=0; it < nTrkImb ; it++ ) { 
+	if ( trkPtImb[it] < cuttrkPtSkim )   continue;
+	if (  fabs(trkEtaImb[it]) > cuttrkEtaSkim ) continue;
+	mtrkPt[nmTrk]  = trkPtImb[it];
+	mtrkEta[nmTrk] = trkEtaImb[it];
+	mtrkPhi[nmTrk] = trkPhiImb[it];
+	mtrkPurity[nmTrk] = trkPurityImb[it];
+	mtrkAlgo[nmTrk] = trkAlgoImb[it];
 	int assocJetId = matchedJetFinder( theJet, mtrkEta[nmTrk], mtrkPhi[nmTrk]);
 	if ( assocJetId < 0 )  {
 	  mtrkAsJetPt[nmTrk] = -1; 
@@ -328,11 +383,10 @@ void forest2yskim_minbias_forestV3(TString inputFile_="forestFiles/HiForest4/HiF
       }
     }
     
-    newtreeTrkJet[evt.cBin][vzBin]->Fill();
+    newtreeTrkJet[cBin][vzBin]->Fill();
   }
+  
   newfile_data->Write();
-  cout << " Done! "<< endl;
+  cout << " Done! "<< endl;  
 }
-
-
 

@@ -34,7 +34,7 @@ void drawSys(TH1 *h,TH1 *sys, Int_t theColor= 90, Int_t fillStyle = -1, Int_t li
     float xx =  h->GetBinCenter(i);
     int iErr = sys->FindBin(xx);
 	
-    Double_t err =  TMath::Abs( val * sys->GetBinContent(iErr));
+    Double_t err =  abs( val * sys->GetBinContent(iErr));
     if (err == 0  ) continue;
 
     if (binWidth <0) {
@@ -58,23 +58,23 @@ void claverCanvasSaving(TCanvas* c, TString s,TString format="gif") {
   c->SaveAs(Form("%s_%d.%s",s.Data(),date->GetDate(), format.Data()));
 }
 
-Double_t getDPHI( Double_t phi1, Double_t phi2) {
-  Double_t dphi = phi1 - phi2;
- 
-  if ( dphi > 3.141592653589 )
-    dphi = dphi - 2. * 3.141592653589;
-  if ( dphi <= -3.141592653589 ) 
-    dphi = dphi + 2. * 3.141592653589;
-  
-  if ( TMath::Abs(dphi) > 3.141592653589 ) {
-    cout << " commonUtility::getDPHI error!!! dphi is bigger than 3.141592653589 " << endl;
+
+
+float normalAngle(float phi )   {
+  float ret = phi;
+  while ( fabs(ret) > 3.1415926 )  {
+    if ( ret > 3.1415926 )  ret = ret - 2.*3.1415926;
+    if ( ret < -3.1415926 )  ret = ret + 2.*3.1415926;
   }
-  
-  return dphi;
+  return ret;
+}
+
+Double_t getDPHI( Double_t phi1, Double_t phi2) {
+  return normalAngle(phi1 - phi2);
 }
 
 Double_t getAbsDphi( Double_t phi1, Double_t phi2) {
-  return TMath::Abs( getDPHI(phi1, phi2) ) ;
+  return fabs( getDPHI(phi1, phi2) );
 }
 
 
@@ -155,7 +155,7 @@ void drawSysAbs(TH1 *h,TH1 *sys, Int_t theColor= kYellow, Int_t fillStyle = -1, 
    for (Int_t i=1;i<=h->GetNbinsX();i++)
       {
          Double_t val = h->GetBinContent(i);
-         Double_t err = TMath::Abs(sys->GetBinContent(i));
+         Double_t err = fabs( sys->GetBinContent(i) );
 	 if (err == 0  ) continue;
 	 TBox *b = new TBox(h->GetBinLowEdge(i),val-err,h->GetBinLowEdge(i+1),val+err);
          b->SetLineColor(theColor);

@@ -73,7 +73,7 @@ void drawL2L3Correciton();
 
 
 void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiForest_Photon40_GR_R_53_LV6_25Feb2014_1530CET_Track8_Jet15.root",
-				   std::string MinbiasFname = "yskimedFiles/skim_collId_kHIDATA_jetAlgo_akPu3PF_HiForest_PbPb_MinBias_Track8_Jet5_GR_R_53_LV2B_merged_forest_0.root",
+				   std::string MinbiasFname = "forestFiles/HiForest4/skim_collId_kHIDATA_jetAlgo_akPu3PF_HIMinBias2011_GR_R_53_LV6_CMSSW_5_3_16_Forest_Track8_Jet21_0.root",
 				   float cutphotonPt  = 35,  // default value dropped to 35GeV  for later photon energy smearing/scaling
 				   sampleType colli=kHIDATA,
 				   bool doMix = true,
@@ -171,7 +171,7 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
   }
   
   
-  // 1. jet tree!
+  // 1.1 jet tree!
   int nJet;
   const int MAXJET = 200; // to accomodate 100 smeared jets, need to be careful with ram
   float jetPt[MAXJET];
@@ -203,12 +203,34 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
     newtreeJet->Branch("refPartonFlv",jetRefPartonFlv,"refPartonFlv[nJet]/I");
   }
 
+  // 1.2 track tree!
+  int nTrk;
+  static const int MAXTRK  = 5000;   // This must be  enough.
+  float trkPt[MAXTRK];
+  float trkEta[MAXTRK];
+  float trkPhi[MAXTRK];
+  float trkDphi[MAXTRK];
+  int   trkPurity[MAXTRK];
+  int   trkAlgo[MAXTRK];
+
+  TTree *newtreeTrk = new TTree("yTrk","trks");
+  newtreeTrk->SetMaxTreeSize(MAXTREESIZE);
+  newtreeTrk->Branch("nTrk",&nTrk,"nTrk/I");
+  newtreeTrk->Branch("pt",trkPt,"pt[nTrk]/F");
+  newtreeTrk->Branch("eta",trkEta,"eta[nTrk]/F");
+  newtreeTrk->Branch("phi",trkPhi,"phi[nTrk]/F");
+  newtreeTrk->Branch("dphi",trkDphi,"dphi[nTrk]/F");
+  newtreeTrk->Branch("purity",trkPurity,"purity[nTrk]/I");
+  newtreeTrk->Branch("algo",trkAlgo,"algo[nTrk]/I");
+
+
   // 2. Background jet tree 
   int nMjet;
   float mJetPt[MAXMJET];
   float mJetEta[MAXMJET];
   float mJetPhi[MAXMJET];
   float mJetDphi[MAXMJET];
+  int   mJetMixingItr[MAXMJET];
   int             mJetSubid[MAXMJET];
   float           mJetRefPt[MAXMJET];
   float           mJetRefEta[MAXMJET];
@@ -223,6 +245,7 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
   tmixJet->Branch("eta",mJetEta,"eta[nJet]/F");
   tmixJet->Branch("phi",mJetPhi,"phi[nJet]/F");
   tmixJet->Branch("dphi", mJetDphi, "dphi[nJet]/F");
+  tmixJet->Branch("mItr", mJetMixingItr, "mItr[nJet]/I");
   if (isMC) {
     tmixJet->Branch("subid",mJetSubid,"subid[nJet]/F");
     tmixJet->Branch("refPt",mJetRefPt,"refPt[nJet]/F");
@@ -231,6 +254,8 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
     tmixJet->Branch("refPartonPt",mJetRefPartonPt,"refPartonPt[nJet]/F");
     tmixJet->Branch("refPartonFlv",mJetRefPartonFlv,"refPartonFlv[nJet]/F");
   }
+
+
 
   // 3. Background jets/tracks from Input Minbias Skim
   // "Imb" means Input MinBias events
@@ -270,15 +295,16 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
     nCentBins = nCentBinSkimPA;
   }
 
-  TChain   *tjmb[100][nVtxBin+1];
-  int nMB[100][nVtxBin+1];
-  int mbItr[100][nVtxBin+1];
+  TChain   *tjmb[200][nVtxBin+1];
+  int nMB[200][nVtxBin+1];
+  int mbItr[200][nVtxBin+1];
   if ( doMix ) {
     cout <<"  Tree initialization for MinBias mixing" << endl;
     for( int icent = 0 ; icent< nCentBins ; icent++) {
       for( int ivz = 1 ; ivz<=nVtxBin ; ivz++) {
 
-	tjmb[icent][ivz] = new TChain(Form("trkAndJets_first_icent%d_ivz%d",icent,ivz));
+	//	tjmb[icent][ivz] = new TChain(Form("trkAndJets_first_icent%d_ivz%d",icent,ivz));
+	tjmb[icent][ivz] = new TChain(Form("trkAndJets_second_icent%d_ivz%d",icent,ivz));
 	tjmb[icent][ivz]->Add(MinbiasFname.data());
 	tjmb[icent][ivz]->SetBranchAddress("evt", &evtImb,&b_evt);
 
@@ -344,6 +370,7 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
     
   // Ready to go into the loop!! 
   int nentries = c->GetEntries();
+  nentries = 10000;
   cout << "number of entries = " << nentries << endl;
   for (Long64_t jentry = 0 ; jentry < nentries; jentry++) {
     eTot++;
@@ -363,7 +390,7 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
     evt.cBin = -99;
     evt.pBin   = -99 ;
     if ((colli==kHIDATA)||(colli==kHIMC))   {
-      evt.cBin = c->evt.hiBin;
+      evt.cBin = getCbinFrom200(c->evt.hiBin);
       evt.pBin   = hEvtPlnBin->FindBin( c->evt.hiEvtPlanes[theEvtPlNumber] ) ;
     }
     else if ((colli==kPADATA)||(colli==kPAMC))   {
@@ -395,7 +422,7 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
     if (colli ==kHIMC) {
       int vBin =  hWeight_vtx_data_pbpb->FindBin(evt.vz);
       wVtx =   hWeight_vtx_data_pbpb->GetBinContent(vBin) / hWeight_vtx_mc_pbpb->GetBinContent(vBin) ;
-      wCent =  hWeight_cent_data_pbpb->GetBinContent(evt.cBin+1) / hWeight_cent_mc_pbpb->GetBinContent(evt.cBin+1) ;
+      wCent =  hWeight_cent_data_pbpb->GetBinContent(c->evt.hiBin/4 +1) / hWeight_cent_mc_pbpb->GetBinContent(c->evt.hiBin/4 +1) ;
     }
     else if ( colli ==kPPMC) {
       int vBin =  hWeight_vtx_data_pp->FindBin(evt.vz);
@@ -410,7 +437,6 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
     evt.ptHat = -1;
     evt.ptHatWeight = 1;
     evt.ptHat = c->photon.ptHat; 
-    cout <<" here 1 " << endl;
     if (colli ==kHIMC) {
       if ( evt.ptHat < 50  )       evt.ptHatWeight = 9008/16237. ; 
       else if ( evt.ptHat < 80  )       evt.ptHatWeight = 3750/85438. ; 
@@ -437,7 +463,6 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
 
       corrPt[j] = newPt[j];
     }
-    cout <<" here 2 " << endl;
 
     TMath::Sort(c->photon.nPhotons, newPt, order);
 
@@ -465,7 +490,6 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
     //    if ( (gj.photonEt < cutphotonPt) )    <== This cut ruins the ptHat weighting factor
     //  continue;
 
-    cout <<" here 3 " << endl;
 
     /// Save leading photons
     if (leadingIndex!=-1) {
@@ -488,12 +512,10 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
       gj.photonEta = - gj.photonEta;
     }
 
-    cout <<" here 4 " << endl;
 
 
-    ///////////////////// Skimmed Jet tree ///////////////////////////////////
+    ///////////////////// Jet tree ///////////////////////////////////
     nJet = 0 ;
-
     int jetEntries = 0;
     if (useGenJetColl )    jetEntries = theJet->ngen;
     else                   jetEntries = theJet->nref;
@@ -605,10 +627,23 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
       
       nJet++ ;
     }
+
+    ///////////////////// 1.2. Track tree ///////////////////////////////////
+    nTrk = 0 ;
+    for (int it=0; it< c->track.nTrk ; it++) {
+      if ( c->track.trkPt[it] < cuttrkPtSkim )   continue;
+      if (  fabs(c->track.trkEta[it]) > cuttrkEtaSkim ) continue;
+      trkPt[nTrk]  = c->track.trkPt[it];
+      trkEta[nTrk] = c->track.trkEta[it];
+      trkPhi[nTrk] = c->track.trkPhi[it];
+      trkPurity[nTrk] = c->track.highPurity[it];
+      trkAlgo[nTrk] = c->track.trkAlgo[it];
+      trkDphi[nTrk] = getAbsDphi( trkPhi[nTrk], gj.photonPhi) ;
+      nTrk++;
+    }
   
     
 
-    cout <<" here 5" << endl;
        
 
     int nMixing = nMixing1;
@@ -632,23 +667,18 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
 	cout << ",  pBin = " << evt.pBin << endl;
 	continue;
       }
-      cout <<" here 7" << endl;
 
       mbItr[cBin][vzBin] = mbItr[cBin][vzBin] + 1;
-      cout <<" here d" << endl;
       if ( mbItr[cBin][vzBin] == nMB[cBin][vzBin] )
 	mbItr[cBin][vzBin] =  mbItr[cBin][vzBin] - nMB[cBin][vzBin];
-      cout <<" here w" << endl;
-      cout <<" mbItr[cBin][vzBin]= " << mbItr[cBin][vzBin] << endl;
-      cout <<"  nMB[cBin][vzBin]= " <<  nMB[cBin][vzBin] << endl;
-      cout << " cbin = " << cBin << endl;
+      //      cout <<" mbItr[cBin][vzBin]= " << mbItr[cBin][vzBin] << endl;
+      //      cout <<"  nMB[cBin][vzBin]= " <<  nMB[cBin][vzBin] << endl;
+      //      cout << " cbin = " << cBin << endl;
       tjmb[cBin][vzBin]->GetEntry(mbItr[cBin][vzBin]);
-      cout <<" here q" << endl;
       
       // ok found the event!! ///////////
       loopCounter =0;  // Re-initiate loopCounter
       // Jet mixing
-    cout <<" here y" << endl;
 
       for (int it = 0 ; it < nJetImb ; it++) {
 	if ( gj.photonEt < 0 )  continue;
@@ -659,7 +689,6 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
           newPhi  =  jetPhiImb[it] +   rand.Gaus(0, phiSmear);
 	}
 	jetPhiImb[nJet] = normalAngle(newPhi);
-	cout <<" here a" << endl;
 	
 	// jet pT residual correction and smearing 
 	Double_t smeared = jetPtImb[it];
@@ -667,7 +696,6 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
           Double_t smearSigma = getPtSmear( smearingCentBin,  jetPtImb[it]);
           smeared = jetPt[nJet] * rand.Gaus(1, smearSigma);
         }
-	cout <<" here 8" << endl;
 	float resCorrection =1. ;	float l2l3Corr =1 ;
 	if  (doJetResCorrection)   {
 	  // Correction from MC closure
@@ -692,9 +720,9 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
 	mJetPt[nMjet]    = smearedCorrected;
 	mJetEta[nMjet]   = jetEtaImb[it];
 	mJetPhi[nMjet]   = jetPhiImb[it];
+	mJetMixingItr[nMjet]   = iMix;
 	if  ( mJetPt[nMjet]>0 )  mJetDphi[nMjet] =  getAbsDphi(mJetPhi[nMjet], gj.photonPhi) ;
 	else            	 mJetDphi[nMjet] = -1;
-    cout <<" here 9" << endl;
 	if ( isMC) {
 	  mJetSubid[nMjet] = jetSubidImb[it];
 	  mJetRefPt[nMjet] = jetRefPtImb[it];
@@ -710,9 +738,9 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
     if ( noSuchEvent )
       continue;
     
-    cout <<" here 10" << endl;
     tgj->Fill();
     newtreeJet->Fill();
+    newtreeTrk->Fill();
     tmixJet->Fill();
     newtreePhoton->Fill();
     //    treeFullJet->Fill();
@@ -756,18 +784,9 @@ double getPtSmear( int smearingCentBin, float jetPt) {
 
 
 
-float normalAngle(float phi )   {
-  float ret = phi;
-  while ( fabs(ret) > PI )  {
-    if ( ret > PI )  ret = ret - 2*PI;
-    if ( ret < -PI )  ret = ret + 2*PI;
-  }
-  return ret;
-}
-
 float getHiResCorr( EvtSel evt, float jetPt) {
   float resCorrection=1;
-  if ( evt.cBin  < 12 )   // central
+  if ( evt.cBin  < 13 )   // central
     resCorrection  =  1.04503 -1.6122  /(sqrt(jetPt)) + 9.27212 / (jetPt);  //1.04503    -1.6122    9.27212
   else                  // peripheral
     resCorrection  =  1.00596 -0.653191/(sqrt(jetPt)) + 4.35373 / (jetPt);  //1.00596     -0.653191  4.35373

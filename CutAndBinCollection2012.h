@@ -220,7 +220,7 @@ TString getSampleName ( int colli) {
   return "NULL";
 }
 
-const int nMixing1 = 20;
+const int nMixing1 = 10;
 
 const int kHIMCNoJetWeight = 2001;
 
@@ -311,7 +311,7 @@ class GammaJet {
     float lJetDphi;
     int lJetSubid;
     void clear() {
-      photonRawEt=-99; photonEt = -99999; photonEta=100; photonPhi=1000;
+      photonRawEt=-99; photonEt = -99999; photonEta=100; photonPhi=0;
       sigmaIetaIeta=-99;
       sumIsol = -99;
       genIso = 9990;

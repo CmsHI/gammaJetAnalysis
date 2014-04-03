@@ -154,7 +154,7 @@ void forest2yskim_minbias_tracks(TString inputFile_="forestFiles/HiForest4/HIMin
       trkEta[nTrk] = c->track.trkEta[it];
       trkPhi[nTrk] = c->track.trkPhi[it]; 
       trkPurity[nTrk] = c->track.highPurity[it];
-      trkPhi[nTrk] = c->track.trkAlgo[it];
+      trkAlgo[nTrk] = c->track.trkAlgo[it];
       
       nTrk++;
     }

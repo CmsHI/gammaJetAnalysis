@@ -86,9 +86,8 @@ void forest2yskim_minbias_tracks(TString inputFile_="forestFiles/HiForest4/HIMin
     for( int ivz = 1 ; ivz<=nVtxBin ; ivz++) {
       newtreeTrkJet[icent][ivz] = new TTree(Form("trkAndJets_first_icent%d_ivz%d",icent,ivz),"track and jets");
       newtreeTrkJet[icent][ivz]->SetMaxTreeSize(MAXTREESIZE);
-      setEvtBranch( newtreeTrkJet[icent][ivz], evt);
 
-
+      newtreeTrkJet[icent][ivz]->Branch("evt",&evt.run,evtLeaves.Data());
       newtreeTrkJet[icent][ivz]->Branch("nTrk",&nTrk,"nTrk/I");
       newtreeTrkJet[icent][ivz]->Branch("trkPt",trkPt,"trkPt[nTrk]/F");
       newtreeTrkJet[icent][ivz]->Branch("trkEta",trkEta,"trkEta[nTrk]/F");
@@ -108,11 +107,10 @@ void forest2yskim_minbias_tracks(TString inputFile_="forestFiles/HiForest4/HIMin
   
   /// LOOP!!
   int nentries = c->GetEntries();
-  //  int nentries = 300;
   if ( maxEvent > 0 ) 
     nentries = maxEvent;
   cout << "number of entries = " << nentries << endl;
-    
+  
   for (Long64_t jentry=0 ; jentry<nentries;jentry++) {
     if (jentry% 100 == 0)  {
       cout <<jentry<<" / "<<nentries<<" "<<setprecision(2)<<(double)jentry/nentries*100<<endl;

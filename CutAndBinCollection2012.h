@@ -276,6 +276,7 @@ class Isolation{
     trackIso = c->photon.trkSumPtHollowConeDR04[j];
   }
 };
+TString isolLeaves = "cc1:cc2:cc3:cc4:cc5:cr1:cr2:cr3:cr4:cr5:ct1PtCut20:ct2PtCut20:ct3PtCut20:ct4PtCut20:ct5PtCut20:ecalIso:hcalIso:trackIso";
 
 
 
@@ -326,6 +327,7 @@ class GammaJet {
       lJetSubid= -99999;
     }
 };
+TString gammaJetLeaves = "photonEt/F:photonRawEt:photonEta:photonPhi:hovere:r9:sigmaIetaIeta:sumIso:genIso:genPhotonEt:genMomId/I:lJetPt/F:lJetEta:lJetPhi:lJetDphi:lJetSubid/I";
 
 class DiJet {
  public:
@@ -414,6 +416,7 @@ class EvtSel {
 
 
 };
+TString evtLeaves = "run/I:evt:cBin:pBin:trig/O:offlSel:noiseFilt:anaEvtSel:vz/F:vtxCentWeight/F:hf4Pos:hf4Neg:hf4Sum:ptHat:ptHatWeight";
 
 
 class fitResult {
@@ -741,15 +744,7 @@ int matchedJetFinder(Jets* theJet, float trkEta, float trkPhi, float trkJetRadiu
     return matchId;
 }
 
-void setEvtBranch(TTree* tgj, EvtSel evt) {
-  tgj->Branch("evt",&evt.run,"run/I:evt:cBin:pBin:trig/O:offlSel:noiseFilt:anaEvtSel:vz/F:vtxCentWeight/F:hf4Pos:hf4Neg:hf4Sum:ptHat:ptHatWeight");
-}
-void setPhotonBranch( TTree* tgj, GammaJet gj){
-  tgj->Branch("lpho",&gj.photonEt,"photonEt/F:photonRawEt:photonEta:photonPhi:hovere:r9:sigmaIetaIeta:sumIso:genIso:genPhotonEt:genMomId/I:lJetPt/F:lJetEta:lJetPhi:lJetDphi:lJetSubid/I");
-}
-void setIsolBranch(TTree* tgj, Isolation isol) {
-  tgj->Branch("isolation",&isol.cc1,"cc1:cc2:cc3:cc4:cc5:cr1:cr2:cr3:cr4:cr5:ct1PtCut20:ct2PtCut20:ct3PtCut20:ct4PtCut20:ct5PtCut20:ecalIso:hcalIso:trackIso");
-}
+
 
 
 void addCentralityFriend(TTree *tSig, TTree *tData,TCut selectionCut)

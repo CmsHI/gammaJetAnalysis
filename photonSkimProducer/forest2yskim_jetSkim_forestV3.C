@@ -288,6 +288,19 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
   
   // 3.2. Tracks  
   // 3.2.1. Tracks in the MB background
+  Int_t           nTrkImb;
+  Float_t         trkPtImb[MAXTRK];
+  Float_t         trkEtaImb[MAXTRK];
+  Float_t         trkPhiImb[MAXTRK];
+  int          trkPurityImb[MAXTRK];
+  int          trkAlgoImb[MAXTRK];
+  TBranch        *b_nTrkImb;
+  TBranch        *b_trkPtImb;
+  TBranch        *b_trkEtaImb;
+  TBranch        *b_trkPhiImb;
+  TBranch        *b_trkPurityImb;
+  TBranch        *b_trkAlgoImb;
+
   // 3.2.2. Tracks underlyng the jets in MB events
   
   int nCentBins =  nCentBinSkim;
@@ -323,6 +336,12 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
 	}
 	
 	// 3.2.1 Tracks  - 1st kind tracks
+	tjmb[icent][ivz]->SetBranchAddress("nTrk",      &nTrkImb,      &b_nTrkImb);
+	tjmb[icent][ivz]->SetBranchAddress("trkPt",     &trkPtImb,     &b_trkPtImb);
+	tjmb[icent][ivz]->SetBranchAddress("trkEta",    &trkEtaImb,    &b_trkEtaImb);
+	tjmb[icent][ivz]->SetBranchAddress("trkPhi",    &trkPhiImb,    &b_trkPhiImb);
+	tjmb[icent][ivz]->SetBranchAddress("trkPurity", &trkPurityImb, &b_trkPurityImb);
+	tjmb[icent][ivz]->SetBranchAddress("trkAlgo",   &trkAlgoImb,   &b_trkAlgoImb);
 
 
 

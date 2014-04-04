@@ -403,7 +403,7 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
   
   // Ready to go into the loop!! 
   int nentries = c->GetEntries();
-  nentries = 10000;
+  //  nentries = 10000;
   cout << "number of entries = " << nentries << endl;
   for (Long64_t jentry = 0 ; jentry < nentries; jentry++) {
     eTot++;
@@ -424,8 +424,8 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
     evt.pBin   = -99 ;
     if ((colli==kHIDATA)||(colli==kHIMC))   {
       evt.cBin = getCbinFrom200(c->evt.hiBin);
-      cout << " cBin1 = " << c->evt.hiBin ;
-      cout << ", cBin2 = " << evt.cBin << endl;
+      //      cout << " cBin1 = " << c->evt.hiBin ;
+      //      cout << ", cBin2 = " << evt.cBin << endl;
       evt.pBin   = hEvtPlnBin->FindBin( c->evt.hiEvtPlanes[theEvtPlNumber] ) ;
     }
     else if ((colli==kPADATA)||(colli==kPAMC))   {
@@ -699,7 +699,7 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
     bool noSuchEvent = false;
     int iMix=0;
     int loopCounter=0;
-    if ( (!doMix) || ( gj.photonEt > 0) )
+    if ( (!doMix) || ( gj.photonEt < 0) )
       iMix = nMixing+1;   // Mixing step will be skipped
 
     while (iMix<nMixing)  {
@@ -784,6 +784,7 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
 	mTrkPt[nMTrk]  = trkPtImb[it];
 	mTrkEta[nMTrk] = trkEtaImb[it];
 	mTrkPhi[nMTrk] = trkPhiImb[it];
+	mTrkDphi[nMJet] =  getAbsDphi(mTrkPhi[nMTrk], gj.photonPhi) ;
 	mTrkPurity[nMTrk] = trkPurityImb[it];
 	mTrkAlgo[nMTrk] = trkAlgoImb[it];
 	int assocJetId = matchedJetFinder( theJet, mTrkEta[nMTrk], mTrkPhi[nMTrk]);

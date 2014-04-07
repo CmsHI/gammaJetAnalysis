@@ -141,7 +141,7 @@ void forest2yskim_minbias_forestV3(TString inputFile_="forestFiles/HiForest4/HIM
       newtreeTrkJet[icent][ivz]->Branch("trkEta",trkEta,"trkEta[nTrk]/F");
       newtreeTrkJet[icent][ivz]->Branch("trkPhi",trkPhi,"trkPhi[nTrk]/F");
       newtreeTrkJet[icent][ivz]->Branch("trkPurity",trkPurity,"trkPurity[nTrk]/I");
-      newtreeTrkJet[icent][ivz]->Branch("trkAlgo",trkAlgo,"trkAlgo[nTrk]/F");
+      newtreeTrkJet[icent][ivz]->Branch("trkAlgo",trkAlgo,"trkAlgo[nTrk]/I");
       newtreeTrkJet[icent][ivz]->Branch("trkAsJetPt",trkAsJetPt,"trkAsJetPt[nTrk]/F");
       newtreeTrkJet[icent][ivz]->Branch("trkAsJetEta",trkAsJetEta,"trkAsJetEta[nTrk]/F");
       newtreeTrkJet[icent][ivz]->Branch("trkAsJetPhi",trkAsJetPhi,"trkAsJetPhi[nTrk]/F");
@@ -153,7 +153,7 @@ void forest2yskim_minbias_forestV3(TString inputFile_="forestFiles/HiForest4/HIM
 	newtreeTrkJet[icent][ivz]->Branch("mTrkEta",mTrkEta,"mTrkEta[nMTrk]/F");
 	newtreeTrkJet[icent][ivz]->Branch("mTrkPhi",mTrkPhi,"mTrkPhi[nMTrk]/F");
 	newtreeTrkJet[icent][ivz]->Branch("mTrkPurity",mTrkPurity,"mTrkPurity[nMTrk]/I");
-	newtreeTrkJet[icent][ivz]->Branch("mTrkAlgo",mTrkAlgo,"mTrkAlgo[nMTrk]/F");
+	newtreeTrkJet[icent][ivz]->Branch("mTrkAlgo",mTrkAlgo,"mTrkAlgo[nMTrk]/I");
 	newtreeTrkJet[icent][ivz]->Branch("mTrkAsJetPt",mTrkAsJetPt,"mTrkAsJetPt[nMTrk]/F");
 	newtreeTrkJet[icent][ivz]->Branch("mTrkAsJetEta",mTrkAsJetEta,"mTrkAsJetEta[nMTrk]/F");
 	newtreeTrkJet[icent][ivz]->Branch("mTrkAsJetPhi",mTrkAsJetPhi,"mTrkAsJetPhi[nMTrk]/F");

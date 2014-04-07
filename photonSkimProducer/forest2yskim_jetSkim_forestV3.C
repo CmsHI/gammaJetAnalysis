@@ -193,7 +193,7 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
   float trkAsJetPhi[MAXTRK];  // associated Jet pT
   float trkAsJetDR[MAXTRK];  // associated Jet pT
 
-  TTree *newtreeTrk = new TTree("yTrk","trks");
+  TTree *newtreeTrk = new TTree("yTrk","ytrks");
   newtreeTrk->SetMaxTreeSize(MAXTREESIZE);
   newtreeTrk->Branch("nTrk",&nTrk,"nTrk/I");
   newtreeTrk->Branch("pt",trkPt,"pt[nTrk]/F");
@@ -244,8 +244,8 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
   float mTrkPt[MAXMTRK];
   float mTrkEta[MAXMTRK];
   float mTrkPhi[MAXMTRK];
-  float mTrkPurity[MAXMTRK];
-  float mTrkAlgo[MAXMTRK];
+  int   mTrkPurity[MAXMTRK];
+  int   mTrkAlgo[MAXMTRK];
   float mTrkDphi[MAXMTRK];
   float mTrkAsJetPt[MAXMTRK];  // associated Jet pT
   float mTrkAsJetEta[MAXMTRK];  // associated Jet pT
@@ -271,8 +271,8 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
   float mmTrkPt[MAXMTRK];
   float mmTrkEta[MAXMTRK];
   float mmTrkPhi[MAXMTRK];
-  float mmTrkPurity[MAXMTRK];
-  float mmTrkAlgo[MAXMTRK];
+  int   mmTrkPurity[MAXMTRK];
+  int   mmTrkAlgo[MAXMTRK];
   float mmTrkDphi[MAXMTRK];
   float mmTrkAsJetPt[MAXMTRK];  // associated Jet pT
   float mmTrkAsJetEta[MAXMTRK];  // associated Jet pT
@@ -396,22 +396,22 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
 	
 	// 3.2.1 Tracks  - 1st kind tracks
 	tjmb[icent][ivz]->SetBranchAddress("nTrk",      &nTrkImb,      &b_nTrkImb);
-	tjmb[icent][ivz]->SetBranchAddress("trkPt",     &trkPtImb,     &b_trkPtImb);
-	tjmb[icent][ivz]->SetBranchAddress("trkEta",    &trkEtaImb,    &b_trkEtaImb);
-	tjmb[icent][ivz]->SetBranchAddress("trkPhi",    &trkPhiImb,    &b_trkPhiImb);
-	tjmb[icent][ivz]->SetBranchAddress("trkPurity", &trkPurityImb, &b_trkPurityImb);
-	tjmb[icent][ivz]->SetBranchAddress("trkAlgo",   &trkAlgoImb,   &b_trkAlgoImb);
+	tjmb[icent][ivz]->SetBranchAddress("trkPt",     trkPtImb,     &b_trkPtImb);
+	tjmb[icent][ivz]->SetBranchAddress("trkEta",    trkEtaImb,    &b_trkEtaImb);
+	tjmb[icent][ivz]->SetBranchAddress("trkPhi",    trkPhiImb,    &b_trkPhiImb);
+	tjmb[icent][ivz]->SetBranchAddress("trkPurity", trkPurityImb, &b_trkPurityImb);
+	tjmb[icent][ivz]->SetBranchAddress("trkAlgo",   trkAlgoImb,   &b_trkAlgoImb);
 	// 3.2.2 Tracks  - 2nd kind tracks
 	tjmb[icent][ivz]->SetBranchAddress("nMTrk",      &nMTrkImb,      &b_nMTrkImb);
-	tjmb[icent][ivz]->SetBranchAddress("mTrkPt",     &mTrkPtImb,     &b_mTrkPtImb);
-	tjmb[icent][ivz]->SetBranchAddress("mTrkEta",    &mTrkEtaImb,    &b_mTrkEtaImb);
-	tjmb[icent][ivz]->SetBranchAddress("mTrkPhi",    &mTrkPhiImb,    &b_mTrkPhiImb);
-	tjmb[icent][ivz]->SetBranchAddress("mTrkPurity", &mTrkPurityImb, &b_mTrkPurityImb);
-	tjmb[icent][ivz]->SetBranchAddress("mTrkAlgo",   &mTrkAlgoImb,   &b_mTrkAlgoImb);
-	tjmb[icent][ivz]->SetBranchAddress("mTrkAsJetPt",&mTrkAsJetPtImb,   &b_mTrkAsJetPtImb);
-	tjmb[icent][ivz]->SetBranchAddress("mTrkAsJetEta",&mTrkAsJetEtaImb,   &b_mTrkAsJetEtaImb);
-	tjmb[icent][ivz]->SetBranchAddress("mTrkAsJetPhi",&mTrkAsJetPhiImb,   &b_mTrkAsJetPhiImb);
-	tjmb[icent][ivz]->SetBranchAddress("mTrkAsJetDR",&mTrkAsJetDRImb,   &b_mTrkAsJetDRImb);
+	tjmb[icent][ivz]->SetBranchAddress("mTrkPt",      mTrkPtImb,     &b_mTrkPtImb);
+	tjmb[icent][ivz]->SetBranchAddress("mTrkEta",    mTrkEtaImb,    &b_mTrkEtaImb);
+	tjmb[icent][ivz]->SetBranchAddress("mTrkPhi",    mTrkPhiImb,    &b_mTrkPhiImb);
+	tjmb[icent][ivz]->SetBranchAddress("mTrkPurity", mTrkPurityImb, &b_mTrkPurityImb);
+	tjmb[icent][ivz]->SetBranchAddress("mTrkAlgo",   mTrkAlgoImb,   &b_mTrkAlgoImb);
+	tjmb[icent][ivz]->SetBranchAddress("mTrkAsJetPt",mTrkAsJetPtImb,   &b_mTrkAsJetPtImb);
+	tjmb[icent][ivz]->SetBranchAddress("mTrkAsJetEta",mTrkAsJetEtaImb,   &b_mTrkAsJetEtaImb);
+	tjmb[icent][ivz]->SetBranchAddress("mTrkAsJetPhi",mTrkAsJetPhiImb,   &b_mTrkAsJetPhiImb);
+	tjmb[icent][ivz]->SetBranchAddress("mTrkAsJetDR",mTrkAsJetDRImb,   &b_mTrkAsJetDRImb);
 
 	nMB[icent][ivz] = tjmb[icent][ivz]->GetEntries();
 	cout << "number of evetns in (icent = " << icent << ", ivtxZ = "<< ivz << ")  = " << nMB[icent][ivz] << endl;
@@ -457,7 +457,7 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
   
   // Ready to go into the loop!! 
   int nentries = c->GetEntries();
-  nentries = 200000;
+  nentries = 50000;
   cout << "number of entries = " << nentries << endl;
   for (Long64_t jentry = 0 ; jentry < nentries; jentry++) {
     eTot++;
@@ -833,32 +833,6 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
       }
       
       // 3.2.1 Tracks  - 1st kind tracks
-      for (int it = 0 ; it < nMTrkImb ; it++) {
-	if ( mTrkPtImb[it] < cuttrkPtSkim )   continue;
-	if (  fabs(mTrkEtaImb[it]) > cuttrkEtaSkim ) continue;
-	mmTrkPt[nMTrk]  = mTrkPtImb[it];
-	mmTrkEta[nMTrk] = mTrkEtaImb[it];
-	mmTrkPhi[nMTrk] = mTrkPhiImb[it];
-	mmTrkDphi[nMJet] =  getAbsDphi(mmTrkPhi[nMTrk], gj.photonPhi) ;
-	mmTrkPurity[nMTrk] = mTrkPurityImb[it];
-	mmTrkAlgo[nMTrk] = mTrkAlgoImb[it];
-	int assocJetId = matchedJetFinder( theJet, mmTrkEta[nMTrk], mmTrkPhi[nMTrk]);
-	if ( assocJetId < 0 )  {
-	  mmTrkAsJetPt[nMTrk] = -1;
-	  mmTrkAsJetEta[nMTrk] = -1;
-	  mmTrkAsJetPhi[nMTrk] = -1;
-	  mmTrkAsJetDR[nMTrk] = 100;
-	}
-	else {
-	  mmTrkAsJetPt[nMTrk] = theJet->jtpt[assocJetId];
-	  mmTrkAsJetEta[nMTrk] = theJet->jteta[assocJetId];
-	  mmTrkAsJetPhi[nMTrk] = theJet->jtphi[assocJetId];
-	  mmTrkAsJetDR[nMTrk] =getDR( mmTrkEta[nMTrk], mmTrkPhi[nMTrk], theJet->jteta[assocJetId], theJet->jtphi[assocJetId]) ;
-	}
-	
-	nMmTrk++;}
-
-      // 3.2.1 Tracks  - 1st kind tracks
       for (int it = 0 ; it < nTrkImb ; it++) {
 	if ( trkPtImb[it] < cuttrkPtSkim )   continue;
 	if (  fabs(trkEtaImb[it]) > cuttrkEtaSkim ) continue;
@@ -885,6 +859,34 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
 	nMTrk++;}
 
       iMix++;}
+
+      // 3.2.1 Tracks  - 2nd kind tracks
+      for (int it = 0 ; it < nMTrkImb ; it++) {
+	if ( mTrkPtImb[it] < cuttrkPtSkim )   continue;
+	if (  fabs(mTrkEtaImb[it]) > cuttrkEtaSkim ) continue;
+	mmTrkPt[nMmTrk]  = mTrkPtImb[it];
+	mmTrkEta[nMmTrk] = mTrkEtaImb[it];
+	mmTrkPhi[nMmTrk] = mTrkPhiImb[it];
+	mmTrkDphi[nMJet] =  getAbsDphi(mmTrkPhi[nMmTrk], gj.photonPhi) ;
+	mmTrkPurity[nMmTrk] = mTrkPurityImb[it];
+	mmTrkAlgo[nMmTrk] = mTrkAlgoImb[it];
+	int assocJetId = matchedJetFinder( theJet, mmTrkEta[nMmTrk], mmTrkPhi[nMmTrk]);
+	if ( assocJetId < 0 )  {
+	  mmTrkAsJetPt[nMmTrk] = -1;
+	  mmTrkAsJetEta[nMmTrk] = -1;
+	  mmTrkAsJetPhi[nMmTrk] = -1;
+	  mmTrkAsJetDR[nMmTrk] = 100;
+	}
+	else {
+	  mmTrkAsJetPt[nMmTrk] = theJet->jtpt[assocJetId];
+	  mmTrkAsJetEta[nMmTrk] = theJet->jteta[assocJetId];
+	  mmTrkAsJetPhi[nMmTrk] = theJet->jtphi[assocJetId];
+	  mmTrkAsJetDR[nMmTrk] =getDR( mmTrkEta[nMmTrk], mmTrkPhi[nMmTrk], theJet->jteta[assocJetId], theJet->jtphi[assocJetId]) ;
+	}
+	nMmTrk++;}
+      
+
+
     
     tgj->Fill();
     newtreeJet->Fill();

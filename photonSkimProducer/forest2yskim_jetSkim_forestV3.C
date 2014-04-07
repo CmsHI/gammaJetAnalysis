@@ -858,7 +858,6 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
 	
 	nMTrk++;}
 
-      iMix++;}
 
       // 3.2.1 Tracks  - 2nd kind tracks
       for (int it = 0 ; it < nMTrkImb ; it++) {
@@ -884,9 +883,10 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
 	  mmTrkAsJetDR[nMmTrk] =getDR( mmTrkEta[nMmTrk], mmTrkPhi[nMmTrk], theJet->jteta[assocJetId], theJet->jtphi[assocJetId]) ;
 	}
 	nMmTrk++;}
-      
-
-
+      iMix++;}
+    
+    
+    
     
     tgj->Fill();
     newtreeJet->Fill();

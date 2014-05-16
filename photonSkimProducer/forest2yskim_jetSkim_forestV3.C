@@ -329,8 +329,8 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
   Float_t         trkPtImb[MAXTRK];
   Float_t         trkEtaImb[MAXTRK];
   Float_t         trkPhiImb[MAXTRK];
-  int          trkPurityImb[MAXTRK];
-  int          trkAlgoImb[MAXTRK];
+  int             trkPurityImb[MAXTRK];
+  int             trkAlgoImb[MAXTRK];
   TBranch        *b_nTrkImb;
   TBranch        *b_trkPtImb;
   TBranch        *b_trkEtaImb;
@@ -402,8 +402,8 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
 	tjmb[icent][ivz]->SetBranchAddress("trkPurity", trkPurityImb, &b_trkPurityImb);
 	tjmb[icent][ivz]->SetBranchAddress("trkAlgo",   trkAlgoImb,   &b_trkAlgoImb);
 	// 3.2.2 Tracks  - 2nd kind tracks
-	tjmb[icent][ivz]->SetBranchAddress("nMTrk",      &nMTrkImb,      &b_nMTrkImb);
-	tjmb[icent][ivz]->SetBranchAddress("mTrkPt",      mTrkPtImb,     &b_mTrkPtImb);
+	tjmb[icent][ivz]->SetBranchAddress("nMTrk",     &nMTrkImb,      &b_nMTrkImb);
+	tjmb[icent][ivz]->SetBranchAddress("mTrkPt",     mTrkPtImb,     &b_mTrkPtImb);
 	tjmb[icent][ivz]->SetBranchAddress("mTrkEta",    mTrkEtaImb,    &b_mTrkEtaImb);
 	tjmb[icent][ivz]->SetBranchAddress("mTrkPhi",    mTrkPhiImb,    &b_mTrkPhiImb);
 	tjmb[icent][ivz]->SetBranchAddress("mTrkPurity", mTrkPurityImb, &b_mTrkPurityImb);
@@ -457,7 +457,7 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
   
   // Ready to go into the loop!! 
   int nentries = c->GetEntries();
-  nentries = 50000;
+  //  nentries = 50000;
   cout << "number of entries = " << nentries << endl;
   for (Long64_t jentry = 0 ; jentry < nentries; jentry++) {
     eTot++;

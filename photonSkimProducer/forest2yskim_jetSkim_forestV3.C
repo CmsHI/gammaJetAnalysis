@@ -477,9 +477,7 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
     evt.cBin = -99;
     evt.pBin   = -99 ;
     if ((colli==kHIDATA)||(colli==kHIMC))   {
-      evt.cBin = getCbinFrom200(c->evt.hiBin);
-      //      cout << " cBin1 = " << c->evt.hiBin ;
-      //      cout << ", cBin2 = " << evt.cBin << endl;
+      evt.cBin = c->evt.hiBin;
       evt.pBin   = hEvtPlnBin->FindBin( c->evt.hiEvtPlanes[theEvtPlNumber] ) ;
     }
     else if ((colli==kPADATA)||(colli==kPAMC))   {
@@ -490,7 +488,10 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
 
     evt.vz = c->evt.vz;
 
-    int cBin = evt.cBin;
+    int cBinSkim = evt.cBin;
+    if ((colli==kHIDATA)||(colli==kHIMC))  
+       cBinSkim = getCbinFrom200(evt.cBin);
+    
     int vzBin = hvz->FindBin(evt.vz)  ;
     hvz->Fill(evt.vz) ;
 
@@ -758,23 +759,23 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
 
     while (iMix<nMixing1)  {
       loopCounter++;
-      if ( loopCounter > nMB[cBin][vzBin]+1) { 
+      if ( loopCounter > nMB[cBinSkim][vzBin]+1) { 
 	// If the photon-jet event are not matched with any of
 	// MinBias Skim events (Centrality/vertex/event plane etc.etc.)
 	iMix = 999999 ;
 	noSuchEvent = true;
 	cout << " no such event!!";
-	cout << "icent = " << cBin << ",  vzBin = " << vzBin;
+	cout << "cBinSkim = " << cBinSkim << ",  vzBin = " << vzBin;
 	cout << ",  pBin = " << evt.pBin << endl;
 	continue;
       }
   
 
-      mbItr[cBin][vzBin] = mbItr[cBin][vzBin] + 1;
-      if ( mbItr[cBin][vzBin] == nMB[cBin][vzBin] )
-	mbItr[cBin][vzBin] =  mbItr[cBin][vzBin] - nMB[cBin][vzBin];
+      mbItr[cBinSkim][vzBin] = mbItr[cBinSkim][vzBin] + 1;
+      if ( mbItr[cBinSkim][vzBin] == nMB[cBinSkim][vzBin] )
+	mbItr[cBinSkim][vzBin] =  mbItr[cBinSkim][vzBin] - nMB[cBinSkim][vzBin];
 
-      tjmb[cBin][vzBin]->GetEntry(mbItr[cBin][vzBin]);
+      tjmb[cBinSkim][vzBin]->GetEntry(mbItr[cBinSkim][vzBin]);
       // ok found the event!! ///////////
       loopCounter =0;  // Re-initiate loopCounter
 
@@ -935,7 +936,7 @@ double getPtSmear( int smearingCentBin, float jetPt) {
 
 float getHiResCorr( EvtSel evt, float jetPt) {
   float resCorrection=1;
-  if ( evt.cBin  < 13 )   // central
+  if ( evt.cBin  < 60 )   // central 30%
     resCorrection  =  1.04503 -1.6122  /(sqrt(jetPt)) + 9.27212 / (jetPt);  //1.04503    -1.6122    9.27212
   else                  // peripheral
     resCorrection  =  1.00596 -0.653191/(sqrt(jetPt)) + 4.35373 / (jetPt);  //1.00596     -0.653191  4.35373

@@ -488,8 +488,8 @@ TCut finalCutGen  =  genPhotonCut ;
 
 
 // Cuts for track and jets
-double cuttrkPtSkim =  3;
-double cuttrkPt =  3;
+double cuttrkPtSkim =  1;
+double cuttrkPt =  1;
 double cuttrkEtaSkim = 1.;
 double cuttrkEta  = 1.;
 

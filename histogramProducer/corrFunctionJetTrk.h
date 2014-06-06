@@ -147,7 +147,7 @@ void corrFunctionTrk::setNorm() {
     cout << " -------- pA DATA------------------------" << endl;
   }
 
-  cout << " purity = " << photonPurity << endl;
+  cout << "purity = " << photonPurity << endl;
   cout << "Pure photons  = " << nPhoSig  << "  (out of " << nPhoCand << " candidates)" <<endl;
 
 

@@ -24,7 +24,6 @@
 #include <TCut.h>
 #include <TClonesArray.h>
 #include <TRandom3.h>
-#include "../../hiForestV3/hiForest.h"
 #include "../CutAndBinCollection2012.h"
 #include "corrFunctionJetTrk.h"
 
@@ -46,7 +45,7 @@ void gammaTrkSingle(     GjSpectra* gjSpec_=nullGj,
 fitResult getPurity(TString fname="", sampleType collision=kHIDATA, TCut candEvtCut = "", TCut sbEvtCut="", TString ccanvasName="",float photonPtThr=60, float photonPtThrUp=9999);
 
 
-void gammaTrkHistProducer(sampleType collision = kPADATA, float photonPtThr=60, float photonPtThrUp=9999, int icent =1) {
+void gammaTrkHistProducer(sampleType collision = kHIDATA, float photonPtThr=40, float photonPtThrUp=9999, int icent =10030){
   TH1::SetDefaultSumw2();
   
   TString stringSampleType = getSampleName(collision); "";
@@ -55,16 +54,13 @@ void gammaTrkHistProducer(sampleType collision = kPADATA, float photonPtThr=60, 
   TString  outName=  Form("photonTrackCorr_%s_output_photonPtThr%d_to_%d_%d.root",stringSampleType.Data(),(int)photonPtThr, (int)photonPtThrUp,  date->GetDate());
   delete date;
   
+ 
   int lowerCent(0),  upperCent(0); 
   TCut centCut  = "";
-  if ( (collision ==kHIDATA) || (collision==kHIMC) )   {
-    lowerCent = centBin1[icent-1];
-    upperCent = centBin1[icent]-1;
-    if ( icent > 9999) {
-      lowerCent = ((icent/100)%100)/2.5;
-      upperCent =  (icent%100)/2.5 -1;
-    }   
-    centCut = Form("cBin >= %d && cBin<= %d",lowerCent,upperCent);
+  if ( (collision ==kHIDATA) || (collision ==kHIMC) ) {
+     lowerCent = ((icent/100)%100) *2 ;
+     upperCent =  (icent%100)*2 -1 ; 
+     centCut = Form("cBin >= %d && cBin<= %d",lowerCent,upperCent);
   }
   else if (  (collision ==kPPDATA) || (collision==kPPMC)  ){  // if it's pp 
     centCut = "(1==1)";
@@ -120,7 +116,6 @@ void gammaTrkHistProducer(sampleType collision = kPADATA, float photonPtThr=60, 
   else fname = "";
   
   multiTreeUtil* tgj = new multiTreeUtil();
-  multiTreeUtil* tgjMC = new multiTreeUtil();
   tgj->addFile(fname,  "tgj",  evtSeltCut,  1);
   tgj->AddFriend("yTrk");
  
@@ -139,10 +134,10 @@ void gammaTrkHistProducer(sampleType collision = kPADATA, float photonPtThr=60, 
   // Obtain background subtracted spectra
   
   float candInt = gSpec->hPtPhoCand->Integral();
-  float candDecay = gSpec->hPtPhoDecay->Integral();
+  float decayInt = gSpec->hPtPhoDecay->Integral();
   gSpec->hPtPhoSig->Reset();
   gSpec->hPtPhoSig->Add(gSpec->hPtPhoCand);
-  gSpec->hPtPhoSig->Add(gSpec->hPtPhoDecay, -(1. - purity) * candInt / candDecay);
+  gSpec->hPtPhoSig->Add(gSpec->hPtPhoDecay, -(1. - purity) * candInt / decayInt);
   gSpec->hPtPhoSig->Scale(1./purity ) ;
   
   TFile outf = TFile(Form("ffFiles/%s",outName.Data()),"update");
@@ -151,7 +146,7 @@ void gammaTrkHistProducer(sampleType collision = kPADATA, float photonPtThr=60, 
   gSpec->hPtPhoSig->Write();
   outf.Close();
   
-  
+  return;
   
   // Objects
   multiTreeUtil* tObj[3];
@@ -256,10 +251,8 @@ fitResult getPurity(TString fname, sampleType collision, TCut evtSeltCut, TCut s
   
   multiTreeUtil* tgj = new multiTreeUtil();
   multiTreeUtil* tgjMC = new multiTreeUtil();
-  cout <<" 1 " << endl;
-  tgj->addFile(fname,  "tgj",  "",  1);
-  cout <<" 2 " << endl;
-  tgj->AddFriend("yTrk");
+  cout << " Calculating Purity....." << endl;           
+  tgj->addFile(fname,  "tgj",  "",  1);         //  tgj->AddFriend("yTrk");
   if   (collision==kPPDATA) { 
     tgjMC->addFile(fnamePPMC_AllQcdPho30to50,    "tgj", "", wPPMC_AllQcdPho30to50 ); 
     tgjMC->addFile(fnamePPMC_AllQcdPho50to80,    "tgj", "", wPPMC_AllQcdPho50to80 ); 
@@ -273,9 +266,10 @@ fitResult getPurity(TString fname, sampleType collision, TCut evtSeltCut, TCut s
     tgjMC->addFile(fnamePAMC_AllQcdPho120to9999,  "tgj","", wPAMC_AllQcdPho120to9999);
   }
   else if (collision==kHIDATA)  {
-    tgjMC->addFile(fnameHIMC_AllQcdPho30to50,     "tgj", "",wHIMC_AllQcdPho30to50);
-    tgjMC->addFile(fnameHIMC_AllQcdPho50to80,     "tgj", "",wHIMC_AllQcdPho50to80);
-    tgjMC->addFile(fnameHIMC_AllQcdPho80to9999,   "tgj", "",wHIMC_AllQcdPho80to9999);
+     /*    tgjMC->addFile(fnameHIMC_AllQcdPho30to50,     "tgj", "",wHIMC_AllQcdPho30to50);
+	   tgjMC->addFile(fnameHIMC_AllQcdPho50to80,     "tgj", "",wHIMC_AllQcdPho50to80);
+	   tgjMC->addFile(fnameHIMC_AllQcdPho80to9999,   "tgj", "",wHIMC_AllQcdPho80to9999);       */
+     tgjMC->addFile(fnameHIMC_AllQcdPho30to9999,   "tgj", "",wHIMC_AllQcdPho80to9999);
   }   
   else { 
     cout << " Error: getPurity.  check the type of the collision!  " << endl;
@@ -286,13 +280,21 @@ fitResult getPurity(TString fname, sampleType collision, TCut evtSeltCut, TCut s
   TH1D* hCand = new TH1D("cand","",25,0,0.025);
   TH1D* hBkg = (TH1D*)hCand->Clone("bkg");  TH1D* hSig = (TH1D*)hCand->Clone("sig");
   
+  cout << " line 1  " << endl;
   tgj->Draw2(   hCand, "sigmaIetaIeta", evtSeltCut , "");
+  cout << " line 2  " << endl;
   tgj->Draw2(   hBkg, "sigmaIetaIeta", sbEvtCut , "");
+  cout << " line 3  " << endl;
   tgjMC->Draw2( hSig, "sigmaIetaIeta", evtSeltCut && "genIso<5 && abs(genMomId)<=22", "");
+  cout << " line 4  " << endl;
+
   handsomeTH1(hCand,1);
   handsomeTH1(hSig,2);
   handsomeTH1(hBkg,4);
   
+  hCand->Draw();
+  hSig->Draw("same");
+  hBkg->Draw("same hist");
 
   TCanvas* cPurity = new TCanvas("cpurity","",500,500);
   fitResult  fitr = doFit ( hSig, hBkg, hCand, 0.005, 0.025);

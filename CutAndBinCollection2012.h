@@ -23,6 +23,7 @@ double a1, a2, a3, a4, a5, a6;
 #include <TH2F.h>
 #include <TCanvas.h>
 #include <TLegend.h>
+#include "../../forest/hiForest.h"
 #include "commonUtility.h"
 #include "multiTreeUtilPhoton2011.h"
 #include "histFunctionD.C"
@@ -161,12 +162,16 @@ double  wPAMC_AllQcdPho120to9999     = 4481. / 151511.;
 
 
 ///////////// PbPb Data // File name checked on Oct 20th
-TString fnameHIDATA                  = "yskimmedFiles/yskim_HiForestPhoton-v7-noDuplicate.root";
+TString fnameHIDATA                  = "yskimmedFiles/skim_collId_kHIDATA_jetAlgo_akPu3PF_hiForest_Photon40_GR_R_53_LV6_25Feb2014_1530CET_Track8_Jet15.root";
 TString fnameHIDATA_noJetResCorr= "yskimmedFiles/yskim_HiForestPhoton-v7-noDuplicate_noJetResCorr.root";
 // PbPb MC  // File name checked on Oct 20th
 TString fnameHIMC_AllQcdPho30to50    =  "yskimmedFiles/yskim_qcdAllPhoton30to50_genPhotonPtCut40_allCent.root";
 TString fnameHIMC_AllQcdPho50to80    =  "yskimmedFiles/yskim_qcdAllPhoton50to80_genPhotonPtCut40_allCent.root";
 TString fnameHIMC_AllQcdPho80to9999  =  "yskimmedFiles/yskim_qcdAllPhoton80to9999_genPhotonPtCut40_allCent.root";
+
+TString fnameHIMC_AllQcdPho30to9999    =  "yskimmedFiles/skim_collId_kHIMC_jetAlgo_akPu3PF_PbPb_pythiaHYDJET_forest_AllQCDPhotons30.root";
+
+
 double  wHIMC_AllQcdPho30to50        = 32796./ 32796.;
 double  wHIMC_AllQcdPho50to80        = 21470./ 53876.;
 double  wHIMC_AllQcdPho80to9999       = 6462. / 58781.;
@@ -252,30 +257,31 @@ struct jetMatchVar{
 
 class Isolation{
  public:
-  float cc1,cc2,cc3,cc4,cc5;
-  float cr1,cr2,cr3,cr4,cr5;
-  float ct1PtCut20,ct2PtCut20,ct3PtCut20,ct4PtCut20,ct5PtCut20;
-  float ecalIso,hcalIso,trackIso;
-
-  void Set(HiForest * c, int j) {    cc1=c->photon.cc1[j];
-    cc2=c->photon.cc2[j];
-    cc3=c->photon.cc3[j];
-    cc4=c->photon.cc4[j];
-    cc5=c->photon.cc5[j];
-    cr1=c->photon.cr1[j];
-    cr2=c->photon.cr2[j];
-    cr3=c->photon.cr3[j];
-    cr4=c->photon.cr4[j];
-    cr5=c->photon.cr5[j];
-    ct1PtCut20=c->photon.ct1PtCut20[j];
-    ct2PtCut20=c->photon.ct2PtCut20[j];
-    ct3PtCut20=c->photon.ct3PtCut20[j];
-    ct4PtCut20=c->photon.ct4PtCut20[j];
-    ct5PtCut20=c->photon.ct5PtCut20[j];
-    ecalIso = c->photon.ecalRecHitSumEtConeDR04[j];
-    hcalIso = c->photon.hcalTowerSumEtConeDR04[j];
-    trackIso = c->photon.trkSumPtHollowConeDR04[j];
-  }
+   float cc1,cc2,cc3,cc4,cc5;
+   float cr1,cr2,cr3,cr4,cr5;
+   float ct1PtCut20,ct2PtCut20,ct3PtCut20,ct4PtCut20,ct5PtCut20;
+   float ecalIso,hcalIso,trackIso;
+   
+   void Set(HiForest * c, int j) {  
+      cc1=c->photon.cc1[j];
+      cc2=c->photon.cc2[j];
+      cc3=c->photon.cc3[j];
+      cc4=c->photon.cc4[j];
+      cc5=c->photon.cc5[j];
+      cr1=c->photon.cr1[j];
+      cr2=c->photon.cr2[j];
+      cr3=c->photon.cr3[j];
+      cr4=c->photon.cr4[j];
+      cr5=c->photon.cr5[j];
+      ct1PtCut20=c->photon.ct1PtCut20[j];
+      ct2PtCut20=c->photon.ct2PtCut20[j];
+      ct3PtCut20=c->photon.ct3PtCut20[j];
+      ct4PtCut20=c->photon.ct4PtCut20[j];
+      ct5PtCut20=c->photon.ct5PtCut20[j];
+      ecalIso = c->photon.ecalRecHitSumEtConeDR04[j];
+      hcalIso = c->photon.hcalTowerSumEtConeDR04[j];
+      trackIso = c->photon.trkSumPtHollowConeDR04[j];
+   }
 };
 TString isolLeaves = "cc1:cc2:cc3:cc4:cc5:cr1:cr2:cr3:cr4:cr5:ct1PtCut20:ct2PtCut20:ct3PtCut20:ct4PtCut20:ct5PtCut20:ecalIso:hcalIso:trackIso";
 

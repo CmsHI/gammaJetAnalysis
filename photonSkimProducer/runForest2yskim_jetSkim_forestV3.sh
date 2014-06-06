@@ -1,15 +1,13 @@
-#void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/pA/pA_photonSkimForest_v85_skimPhotonPt50_eta1.5.root",
-#                                   std::string MinbiasFname = "skim_trackJet_minbiasTrackJet_mc.root",
-#                                   float cutphotonPt  = 35,  // default value dropped to 35GeV  for later photon energy smearing/scaling
-#                                   std::string outname = "testPhotonSkim.root",
-#                                   sampleType colli=kPADATA,
-#                                   bool doMix = false,
-#                                   bool doJetResCorrection = 1,  // jet energy correction is done by default from Oct 19th (YS)
-#				    int smearingCentBin = -1, //0=0-10%, 1=10-30%, 2=30-50%, 3=50-100%, 4=0-30%, 5=30-100%  : Jet pT and phi smearing!
-#                                   float addFlatJetEnergyRes = 0,
+#void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiForest_Photon40_GR_R_53_LV6_25Feb2014_1530CET_Track8_Jet15.root",
+#                                   std::string MinbiasFname = "forestFiles/HiForest4/skim_collId_kHIDATA_jetAlgo_akPu3PF_HIMinBias2011_GR_R_53_LV6_CMSSW_5_#
+#                                   float cutphotonPt  = 35,
+#                                   sampleType colli=kHIDATA,
+#                                   TString jetAlgo="akPu3PF",
+#                                   bool doMix = true,
+#                                   bool doJetResCorrection = 0, 
+#                                   int smearingCentBin = -1, //0=0-10%, 1=10-30%, 2=30-50%, 3=50-100%, 4=0-30%, 5=30-100%  : Jet pT and phi smearing!
 #                                   bool useGenJetColl = 0
 #                                   )
-
 
 
 #enum sampleType { kHIDATA, kHIMC, kPPDATA, kPPMC, kPADATA, kPAMC};

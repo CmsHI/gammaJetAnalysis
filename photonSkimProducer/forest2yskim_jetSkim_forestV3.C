@@ -76,11 +76,11 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
 				   std::string MinbiasFname = "forestFiles/HiForest4/skim_collId_kHIDATA_jetAlgo_akPu3PF_HIMinBias2011_GR_R_53_LV6_CMSSW_5_3_16_Forest_Track8_Jet21_0.root",
 				   float cutphotonPt  = 35,  // default value dropped to 35GeV  for later photon energy smearing/scaling
 				   sampleType colli=kHIDATA,
+				   TString jetAlgo="akPu3PF",
 				   bool doMix = true,
 				   bool doJetResCorrection = 0,  // = L2L3 * MC nonclosure correction  jet energy correction is done by default from Oct 19th (YS)
 				   int smearingCentBin = -1, //0=0-10%, 1=10-30%, 2=30-50%, 3=50-100%, 4=0-30%, 5=30-100%  : Jet pT and phi smearing!
-				   bool useGenJetColl = 0,
-				   TString jetAlgo="akPu3PF"
+				   bool useGenJetColl = 0
 				   )
 {
   TString sampleString = "kPPDATA";
@@ -478,6 +478,7 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
     evt.pBin   = -99 ;
     if ((colli==kHIDATA)||(colli==kHIMC))   {
       evt.cBin = c->evt.hiBin;
+      if (colli==kHIMC)  evt.cBin = evt.cBin * 4; // until the new MC sample is ready ( Jun 6th) 
       evt.pBin   = hEvtPlnBin->FindBin( c->evt.hiEvtPlanes[theEvtPlNumber] ) ;
     }
     else if ((colli==kPADATA)||(colli==kPAMC))   {

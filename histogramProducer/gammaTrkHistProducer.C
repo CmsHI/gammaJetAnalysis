@@ -280,13 +280,9 @@ fitResult getPurity(TString fname, sampleType collision, TCut evtSeltCut, TCut s
   TH1D* hCand = new TH1D("cand","",25,0,0.025);
   TH1D* hBkg = (TH1D*)hCand->Clone("bkg");  TH1D* hSig = (TH1D*)hCand->Clone("sig");
   
-  cout << " line 1  " << endl;
   tgj->Draw2(   hCand, "sigmaIetaIeta", evtSeltCut , "");
-  cout << " line 2  " << endl;
   tgj->Draw2(   hBkg, "sigmaIetaIeta", sbEvtCut , "");
-  cout << " line 3  " << endl;
   tgjMC->Draw2( hSig, "sigmaIetaIeta", evtSeltCut && "genIso<5 && abs(genMomId)<=22", "");
-  cout << " line 4  " << endl;
 
   handsomeTH1(hCand,1);
   handsomeTH1(hSig,2);
@@ -301,8 +297,7 @@ fitResult getPurity(TString fname, sampleType collision, TCut evtSeltCut, TCut s
   drawText(Form("Purity : %.2f", (float)fitr.purity010), 0.5680963,0.429118);
   drawText(Form("p_{T}^{#gamma}: %d-%d GeV", (int)photonPtThr, (int)photonPtThrUp), 0.568,0.529118);
   cPurity->SaveAs( Form("%s.pdf",canvasName.Data() ) );
-  gPad->SetLogy();
-  cPurity->SaveAs( Form("%s_logScale.pdf",canvasName.Data() ) );
+  //  gPad->SetLogy();   cPurity->SaveAs( Form("%s_logScale.pdf",canvasName.Data() ) );
    
   TCanvas* c1 = new TCanvas("c1","",100,100);
   

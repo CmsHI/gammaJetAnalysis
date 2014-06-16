@@ -124,7 +124,7 @@ void forest2yskim_minbias_tracks(TString inputFile_="forestFiles/HiForest4/HIMin
     evt.hf4Sum = evt.hf4Pos + evt.hf4Neg;
     evt.cBin = -99;
     evt.pBin   = -99 ;
-    if ((colli==kHIDATA)||(colli==kHIMC))   {
+    if ((colli==kHIDATA)||(colli==kHIMC)) {
       evt.cBin = getCbinFrom200(c->evt.hiBin);
       evt.pBin   = hEvtPlnBin->FindBin( c->evt.hiEvtPlanes[theEvtPlNumber] ) ;
     }
@@ -148,6 +148,7 @@ void forest2yskim_minbias_tracks(TString inputFile_="forestFiles/HiForest4/HIMin
     for (int it=0; it < c->track.nTrk; it++ ) { 
       if ( c->track.trkPt[it] < cuttrkPtSkim )   continue;
       if (  fabs(c->track.trkEta[it]) > cuttrkEtaSkim ) continue;
+      if ( c->selectTrack(it)  == false ) continue;
       trkPt[nTrk]  = c->track.trkPt[it];
       trkEta[nTrk] = c->track.trkEta[it];
       trkPhi[nTrk] = c->track.trkPhi[it]; 

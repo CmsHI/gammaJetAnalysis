@@ -476,9 +476,12 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
     evt.hf4Sum = evt.hf4Pos + evt.hf4Neg;
     evt.cBin = -99;
     evt.pBin   = -99 ;
-    if ((colli==kHIDATA)||(colli==kHIMC))   {
+    if (colli==kHIDATA) {
       evt.cBin = c->evt.hiBin;
-      if (colli==kHIMC)  evt.cBin = evt.cBin * 4; // until the new MC sample is ready ( Jun 6th) 
+      evt.pBin   = hEvtPlnBin->FindBin( c->evt.hiEvtPlanes[theEvtPlNumber] ) ;
+    }
+    if (colli==kHIMC) {
+      evt.cBin = c->evt.hiBin * 5; // at the moment
       evt.pBin   = hEvtPlnBin->FindBin( c->evt.hiEvtPlanes[theEvtPlNumber] ) ;
     }
     else if ((colli==kPADATA)||(colli==kPAMC))   {
@@ -724,6 +727,7 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
     for (int it=0; it< c->track.nTrk ; it++) {
       if ( c->track.trkPt[it] < cuttrkPtSkim )   continue;
       if (  fabs(c->track.trkEta[it]) > cuttrkEtaSkim ) continue;
+      if ( c->selectTrack(it)  == false) continue;
       trkPt[nTrk]  = c->track.trkPt[it];
       trkEta[nTrk] = c->track.trkEta[it];
       trkPhi[nTrk] = c->track.trkPhi[it];

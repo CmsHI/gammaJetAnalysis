@@ -34,7 +34,7 @@ void drawSys(TH1 *h,TH1 *sys, Int_t theColor= 90, Int_t fillStyle = -1, Int_t li
     float xx =  h->GetBinCenter(i);
     int iErr = sys->FindBin(xx);
 	
-    Double_t err =  abs( val * sys->GetBinContent(iErr));
+    Double_t err =  fabs( val * sys->GetBinContent(iErr));
     if (err == 0  ) continue;
 
     if (binWidth <0) {

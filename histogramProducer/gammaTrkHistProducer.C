@@ -27,6 +27,7 @@
 #include "../CutAndBinCollection2012.h"
 #include "corrFunctionJetTrk.h"
 
+
 GjSpectra* nullGj;
 
 void gammaTrkSingle(     GjSpectra* gjSpec_=nullGj,
@@ -81,12 +82,12 @@ void gammaTrkHistProducer(sampleType collision = kHIDATA, float photonPtThr=40, 
   if ( (collision==kPPMC) || (collision==kPPDATA) ) 
     caloIso = "(ecalIso < 4.2  &&  hcalIso < 2.2  &&  trackIso < 2) && hovere<0.1";
   else if ( (collision==kHIMC) || (collision==kHIDATA) )
-    caloIso = "(sumIso<1) && hovere<0.1";
+    caloIso = "(sumIso<5) && hovere<0.1";
   else {
     caloIso = "ecalIso < 4.2  &&  hcalIso < 2.2  &&  trackIso < 2 && hovere<0.1";
   }
   
-  TCut sbIso   = "(sumIso>10) && (sumIso<20) && hovere<0.1";
+  TCut sbIso   = "(sumIso>5) && (sumIso<20) && hovere<0.1";
   //  if ( (collision==kPPMC) || (collision==kPPDATA) || (collision==kPAMC) || (collision==kPADATA)  )
   //  sbIso   = "ecalIso < 4.2  &&  hcalIso < 2.2 && trackIso > 2 && trackIso < 5 && hovere<0.1";
 
@@ -146,7 +147,6 @@ void gammaTrkHistProducer(sampleType collision = kHIDATA, float photonPtThr=40, 
   gSpec->hPtPhoSig->Write();
   outf.Close();
   
-  return;
   
   // Objects
   multiTreeUtil* tObj[3];
@@ -160,14 +160,39 @@ void gammaTrkHistProducer(sampleType collision = kHIDATA, float photonPtThr=40, 
   tObj[kTrkBkg]->AddFriend("tgj");
   TCut trkCut     =  Form("abs(eta)<%f && pt>%f", (float)cuttrkEta, (float)cuttrkPt );
   
-  TH1D* hJetDphi = new TH1D(Form("jetDphi_icent%d",icent),";#Delta#phi_{Jet,#gamma} ;dN/d#Delta#phi",20,0,3.141592);
-  corrFunctionTrk* cTrkDphi = new corrFunctionTrk();
   TString varTrkDphi         = Form("dphi");
 
+  corrFunctionTrk* cTrkDphi = new corrFunctionTrk();
+  TH1D* hTrkDphi = new TH1D(Form("dphi_icent%d",icent),";#Delta#phi_{Jet,#gamma} ;dN/d#Delta#phi",20,0,3.141592);
   gammaTrkSingle( gSpec,  tObj, cTrkDphi,  purity, 
-		  collision, varTrkDphi, trkCut, "1.0",
-		  phoCandCut, phoDecayCut,  hJetDphi, outName);
-  
+		  collision, varTrkDphi, trkCut, "pt",
+		  phoCandCut, phoDecayCut,  hTrkDphi, outName);
+
+  TH1D* hTrkDphi1to2GeV = new TH1D(Form("dphi_icent%d_pt1to2GeV",icent),";#Delta#phi_{Jet,#gamma} ;dN/d#Delta#phi",20,0,3.141592);
+  corrFunctionTrk* cTrkDphi1to2GeV = new corrFunctionTrk();
+  gammaTrkSingle( gSpec,  tObj, cTrkDphi1to2GeV,  purity, 
+		  collision, varTrkDphi, trkCut && "pt > 1 && pt <=2", "pt",
+		  phoCandCut, phoDecayCut,  hTrkDphi, outName);
+
+  TH1D* hTrkDphi2to4GeV = new TH1D(Form("dphi_icent%d_pt2to4GeV",icent),";#Delta#phi_{Jet,#gamma} ;dN/d#Delta#phi",20,0,3.141592);
+  corrFunctionTrk* cTrkDphi2to4GeV = new corrFunctionTrk();
+  gammaTrkSingle( gSpec,  tObj, cTrkDphi2to4GeV,  purity, 
+		  collision, varTrkDphi, trkCut && "pt > 2 && pt <=4", "pt",
+		  phoCandCut, phoDecayCut,  hTrkDphi, outName);
+
+  TH1D* hTrkDphi4to8GeV = new TH1D(Form("dphi_icent%d_pt4to8GeV",icent),";#Delta#phi_{Jet,#gamma} ;dN/d#Delta#phi",20,0,3.141592);
+  corrFunctionTrk* cTrkDphi4to8GeV = new corrFunctionTrk();
+  gammaTrkSingle( gSpec,  tObj, cTrkDphi4to8GeV,  purity, 
+		  collision, varTrkDphi, trkCut && "pt > 4 && pt <=8", "pt",
+		  phoCandCut, phoDecayCut,  hTrkDphi, outName);
+
+  TH1D* hTrkDphi8andHighGeV = new TH1D(Form("dphi_icent%d_pt8andHighGeV",icent),";#Delta#phi_{Jet,#gamma} ;dN/d#Delta#phi",20,0,3.141592);
+  corrFunctionTrk* cTrkDphi8andHighGeV = new corrFunctionTrk();
+  gammaTrkSingle( gSpec,  tObj, cTrkDphi8andHighGeV,  purity, 
+		  collision, varTrkDphi, trkCut && "pt > 8", "pt",
+		  phoCandCut, phoDecayCut,  hTrkDphi, outName);
+
+
 }
 
 
@@ -190,10 +215,10 @@ void gammaTrkSingle(     GjSpectra* gSpec,  multiTreeUtil* tObj[3],   corrFuncti
   }
   
   if ( (collision==kHIDATA) || (collision==kPPDATA) || (collision==kPADATA) ) {
-    cout << "Filling decay photon-jet correlation" << endl;
+    cout << "Filling decay photon - jet correlation" << endl;
     tObj[kTrkRaw]->Draw2(corr->Func[kPhoDecay][kTrkRaw], var, phoDecayCut && cut,  theWeight);
     if (tObj[kTrkBkg]!=0)   {
-      cout << "Filling decay photon- mixed jet correlation" << endl;
+      cout << "Filling decay photon - mixed jet correlation" << endl;
       tObj[kTrkBkg]->Draw2(corr->Func[kPhoDecay][kTrkBkg], var, phoDecayCut && cut,  theWeight);
     }
   }

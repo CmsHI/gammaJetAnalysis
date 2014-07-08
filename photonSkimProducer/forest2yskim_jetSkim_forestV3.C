@@ -22,9 +22,10 @@
 using namespace std;
 
 static const int MAXTRK  = 10000;   // This is very enough.
-static const int MAXMTRK = 30000;   // Again this is very enough for 10 mixing
+static const int MAXMTRK = 80000;   // Again this is very enough for 10 mixing
 static const int MAXMJET = 2000;
 static const long MAXTREESIZE = 10000000000;
+
 
 
 vector<jetKinem> nullVec;
@@ -78,11 +79,14 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
 				   sampleType colli=kHIDATA,
 				   TString jetAlgo="akPu3PF",
 				   bool doMix = true,
+				   TString triggerSelection="",
 				   bool doJetResCorrection = 0,  // = L2L3 * MC nonclosure correction  jet energy correction is done by default from Oct 19th (YS)
 				   int smearingCentBin = -1, //0=0-10%, 1=10-30%, 2=30-50%, 3=50-100%, 4=0-30%, 5=30-100%  : Jet pT and phi smearing!
 				   bool useGenJetColl = 0
 				   )
+
 {
+
   TString sampleString = "kPPDATA";
   if (colli==kPADATA) sampleString = "kPADATA";
   if (colli==kHIDATA) sampleString = "kHIDATA";
@@ -101,11 +105,11 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
   if ((colli==kPPDATA)||(colli==kPADATA)||(colli==kHIDATA))
     isMC=false;
 
-  int seconds = time(NULL);   //      cout << " time = " <<seconds%10000<< endl;
+  int seconds = time(NULL);            //   cout << " time = " <<seconds%10000<< endl;
   TRandom3 rand(seconds%10000);
   TString datafname  = "";
   float cutphotonEta = 1.44;
-  float preCutPhotonEt = 30;
+  float preCutPhotonEt = 15;
 
   const int nMaxPho = 100;
 
@@ -132,9 +136,8 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
   drawL2L3Correciton();
 
   // Create a new root file
-
-
-  TString outname =  inputFile_(0, inputFile_.Last('/')+1) +  "skim_collId_" + sampleString + "_jetAlgo_" + jetAlgo + "_" + inputFile_(inputFile_.Last('/')+1,200)  ;
+  
+  TString outname =  inputFile_(0, inputFile_.Last('/')+1) +  "skim_collId_" + sampleString + "_jetAlgo_" + jetAlgo + "_20mixed_" + inputFile_(inputFile_.Last('/')+1,200)  ;
   TFile* newfile_data = new TFile(outname.Data(),"recreate");
 
   TTree* newtreePhoton;
@@ -444,20 +447,35 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
   // jet algos
   Jets* theJet;
   Jets* genJetTree;
-  if (   (colli==kPPDATA) || (colli==kPPMC) ) {
-    theJet = &(c->ak3PF) ;
-    cout << "pp collision.  Using ak3PF Jet Algo" << endl<<endl;
+
+  if ( jetAlgo == "akPu3PF")  {
+    theJet = &(c->akPu3PF) ;   cout << "Using akPu3PF Jet Algo" << endl<<endl;
+  }
+  else if ( jetAlgo == "akVs3PF") {
+    theJet = &(c->akVs3PF) ;   cout << "Using ak3PF Jet Algo, Voronoi Subtraction method" << endl<<endl;
+  }
+  else if ( jetAlgo == "ak3PF")  {
+    theJet = &(c->ak3PF) ;   cout << "Using ak3PF Jet Algo" << endl<<endl;
   }
   else {
-    theJet = &(c->akPu3PF) ;
-    cout << "pa, aa collision. Using akPu3PF Jet Algo" << endl<<endl;
+    cout <<" Jet algo  " << jetAlgo << "is not available" << endl;
+    return;
   }
   genJetTree = &(c->akPu3PF);
   
+ 
+  // Trigger bit
+  Int_t triggerFlag; 
+  TBranch        *b_triggerFlag;
+  TChain   *HltChain = new TChain("hltanalysis/HltTree");
+  if ( triggerSelection != "" )   {
+    HltChain->Add(inputFile_.Data());
+    HltChain->SetBranchAddress( triggerSelection.Data(), &triggerFlag, &b_triggerFlag);   // HLT_PAPhoton20_NoCaloIdVL_v1
+  }
   
   // Ready to go into the loop!! 
   int nentries = c->GetEntries();
-  //  nentries = 50000;
+  //  nentries = 5000;
   cout << "number of entries = " << nentries << endl;
   for (Long64_t jentry = 0 ; jentry < nentries; jentry++) {
     eTot++;
@@ -466,6 +484,12 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
     }
     
     c->GetEntry(jentry);
+
+    if ( triggerSelection == "" )            triggerFlag = true; 
+    else                            HltChain->GetEntry(jentry);   // trigger tree
+    
+    if ( triggerFlag == false)  {  //      cout << " Trigger is not fired" << endl;
+      continue;}
 
     // Select events with a generated photon in mid-rapidity
     evt.clear();

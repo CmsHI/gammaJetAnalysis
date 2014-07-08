@@ -23,7 +23,7 @@ double a1, a2, a3, a4, a5, a6;
 #include <TH2F.h>
 #include <TCanvas.h>
 #include <TLegend.h>
-#include "../../forest/hiForest.h"
+#include "../../HiForestAnalysisPostHP/hiForest.h"
 #include "commonUtility.h"
 #include "multiTreeUtilPhoton2011.h"
 #include "histFunctionD.C"
@@ -226,7 +226,7 @@ TString getSampleName ( int colli) {
   return "NULL";
 }
 
-const int nMixing1 = 10;
+const int nMixing1 = 20;
 
 const int kHIMCNoJetWeight = 2001;
 

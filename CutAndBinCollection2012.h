@@ -34,7 +34,8 @@ double a1, a2, a3, a4, a5, a6;
 // Updated on Oct 20th.   Jet energy residual correction is done by default.
 ///////////// pp Data
 
-TString fnamePPDATA                  =   "yskimmedFiles/yskim_pp_photonSKimForest_v85_jetNoSmearing.root";
+//TString fnamePPDATA                  =   "yskimmedFiles/yskim_pp_photonSKimForest_v85_jetNoSmearing.root";
+TString fnamePPDATA                  =   "../skim_collId_kPPDATA_jetAlgo_ak3PF_20mixed_HiForest_6_1_VPL.root";
 //no Residual correction
 TString fnamePPDATA_noJetResCorr    = "yskimmedFiles/yskim_pp_photonSKimForest_v85_jetNoSmearing_noJetResCorr.root";
 /// jet energy smeared  // Now these are smeared and thn corr by default
@@ -47,6 +48,10 @@ TString fnamePPDATA30100                =   "yskimmedFiles/yskim_pp_photonSKimFo
 TString fnamePPDATA0030                =   "yskimmedFiles/yskim_pp_photonSKimForest_v85_jetSmearingCent0030.root";
 
 // pp MC
+
+TString fnamePPMC_AllQcdPho30    = "forestFiles/pp/skim_collId_kPPMC_jetAlgo_akPu3PF_20mixed_pp2760_pythia_allQCDPhoton30_CMSSW538HIp2.root";
+
+
 TString fnamePPMC_AllQcdPho30to50    = "yskimmedFiles/yskim_merged_allQCDPhoton30to50_genPhotonPtCut30_CMSSW538HIp2.root";
 TString fnamePPMC_AllQcdPho50to80    = "yskimmedFiles/yskim_merged_allQCDPhoton50to80_genPhotonPtCut30_CMSSW538HIp2.root";
 TString fnamePPMC_AllQcdPho80to120   = "yskimmedFiles/yskim_merged_allQCDPhoton80to120_genPhotonPtCut30_CMSSW538HIp2.root";
@@ -169,7 +174,7 @@ TString fnameHIMC_AllQcdPho30to50    =  "yskimmedFiles/yskim_qcdAllPhoton30to50_
 TString fnameHIMC_AllQcdPho50to80    =  "yskimmedFiles/yskim_qcdAllPhoton50to80_genPhotonPtCut40_allCent.root";
 TString fnameHIMC_AllQcdPho80to9999  =  "yskimmedFiles/yskim_qcdAllPhoton80to9999_genPhotonPtCut40_allCent.root";
 
-TString fnameHIMC_AllQcdPho30to9999    =  "yskimmedFiles/skim_collId_kHIMC_jetAlgo_akPu3PF_PbPb_pythiaHYDJET_forest_AllQCDPhotons30.root";
+TString fnameHIMC_AllQcdPho30to9999    =  "forestFiles/pbpb/skim_collId_kHIMC_jetAlgo_akPu3PF_PbPb_pythiaHYDJET_forest_AllQCDPhotons30.root";
 
 
 double  wHIMC_AllQcdPho30to50        = 32796./ 32796.;

@@ -108,6 +108,17 @@ void forest2yskim_minbias_forestV3(TString inputFile_="forestFiles/HiForest4/HIM
   float jetRefPartonPt[MAXJET];
   int  jetRefPartonFlv[MAXJET];
 
+  // genparticle tree
+  
+  const int MAXCh = 10000;
+  int nCh;
+  int chChg[MAXCh];
+  int chPdg[MAXCh];
+  float chPt[MAXCh];
+  float chEta[MAXCh];
+  float chPhi[MAXCh];
+
+
   EvtSel evt;
   TTree* newtreeTrkJet[200][nVtxBin+1];
   
@@ -123,6 +134,7 @@ void forest2yskim_minbias_forestV3(TString inputFile_="forestFiles/HiForest4/HIM
       newtreeTrkJet[icent][ivz]->SetMaxTreeSize(MAXTREESIZE);
       newtreeTrkJet[icent][ivz]->Branch("evt",&evt.run,evtLeaves.Data());
       
+      // jets
       newtreeTrkJet[icent][ivz]->Branch("nJet",&nJet,"nJet/I");
       newtreeTrkJet[icent][ivz]->Branch("jetPt",jetPt,"jetPt[nJet]/F");
       newtreeTrkJet[icent][ivz]->Branch("jetEta",jetEta,"jetEta[nJet]/F");
@@ -136,6 +148,17 @@ void forest2yskim_minbias_forestV3(TString inputFile_="forestFiles/HiForest4/HIM
 	newtreeTrkJet[icent][ivz]->Branch("refPartonFlv",jetRefPartonFlv,"refPartonFlv[nJet]/I");
       }
       
+      // charged particles
+      if ( isMC) { 
+	newtreeTrkJet[icent][ivz]->Branch("nCh",&nCh,"nCh/I");
+	newtreeTrkJet[icent][ivz]->Branch("chPt",chPt,"chPt[nCh]/F");
+	newtreeTrkJet[icent][ivz]->Branch("chEta",chEta,"chEta[nCh]/F");
+	newtreeTrkJet[icent][ivz]->Branch("chPhi",chPhi,"chPhi[nCh]/F");
+	newtreeTrkJet[icent][ivz]->Branch("chPdg",chPdg,"chPdg[nCh]/I");
+	newtreeTrkJet[icent][ivz]->Branch("chChg",chChg,"chChg[nCh]/I");
+      }
+      
+      // tracks
       newtreeTrkJet[icent][ivz]->Branch("nTrk",&nTrk,"nTrk/I");
       newtreeTrkJet[icent][ivz]->Branch("trkPt",trkPt,"trkPt[nTrk]/F");
       newtreeTrkJet[icent][ivz]->Branch("trkEta",trkEta,"trkEta[nTrk]/F");
@@ -308,6 +331,21 @@ void forest2yskim_minbias_forestV3(TString inputFile_="forestFiles/HiForest4/HIM
       nJet++ ;
     }
     
+    // charged particles 
+    nCh = 0;
+    if ( isMC) {
+      for (int it=0; it< c->genparticle.mult ; it++) {
+        if ( c->genparticle.pt[it] < cuttrkPtSkim )   continue;
+        if (  fabs(c->genparticle.eta[it]) > cuttrkEtaSkim ) continue;
+        if ( c->genparticle.chg[it] == 0 ) continue;
+        //      if ( c->genparticle.sube[it] != 0 ) continue;
+	chPdg[nCh]  = c->genparticle.pdg[it];
+        chChg[nCh]  = c->genparticle.chg[it];
+        chPt[nCh]  = c->genparticle.pt[it];
+        chEta[nCh]  = c->genparticle.eta[it];
+        chPhi[nCh]  = c->genparticle.phi[it];
+        nCh++;}
+    }
     
     ///////////////////////////// Tracks //////////////////////////////
     nTrk = 0; 

@@ -24,7 +24,7 @@ using namespace std;
 static const int MAXTRK  = 10000;   // This is very enough.
 static const int MAXMTRK = 80000;   // Again this is very enough for 10 mixing
 static const int MAXMJET = 2000;
-static const long MAXTREESIZE = 10000000000;
+static const long MAXTREESIZE = 30000000000;
 
 
 
@@ -209,6 +209,29 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
   newtreeTrk->Branch("ajEta",trkAsJetEta,"ajEta[nTrk]/F");
   newtreeTrk->Branch("ajPhi",trkAsJetPhi,"ajPhi[nTrk]/F");
   newtreeTrk->Branch("ajDR",trkAsJetDR,"ajDR[nTrk]/F");
+
+  
+  const int MAXCh = 10000;
+  int nCh;
+  int chSube[MAXCh];
+  int chChg[MAXCh];
+  int chPdg[MAXCh];
+  float chPt[MAXCh];
+  float chEta[MAXCh];
+  float chPhi[MAXCh];
+  float chDphi[MAXCh];
+  
+  TTree *treeChg = new TTree("ch","charged particles stable");
+  treeChg->SetMaxTreeSize(MAXTREESIZE);
+  treeChg->Branch("nCh",&nCh,"nCh/I");
+  treeChg->Branch("pt",chPt,"pt[nCh]/F");
+  treeChg->Branch("eta",chEta,"eta[nCh]/F");
+  treeChg->Branch("phi",chPhi,"phi[nCh]/F");
+  treeChg->Branch("dphi",chDphi,"dphi[nCh]/F");
+  treeChg->Branch("pdg",chPdg,"pdg[nCh]/I");
+  treeChg->Branch("sube",chSube,"sube[nCh]/I");
+  treeChg->Branch("chg",chChg,"chg[nCh]/I");
+
 
 
   // 2.1 Background jet tree 
@@ -490,7 +513,6 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
     
     if ( triggerFlag == false)  {  //      cout << " Trigger is not fired" << endl;
       continue;}
-
     // Select events with a generated photon in mid-rapidity
     evt.clear();
     evt.run   = c->evt.run;
@@ -525,8 +547,8 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
 
     //   if ( ( (colli==kHIDATA)||(colli==kHIMC)||(colli==kPADATA)||(colli==kPAMC) || (colli==kPPMC) ) && ( c->selectEvent() == 0 ))
     //   continue;
-    if ( ( (colli==kPADATA)||(colli==kPPDATA) ) && ( c->skim.pVertexFilterCutGplus ==0 ) ) // No Pile up events
-      continue;
+    //    if ( ( (colli==kPADATA)||(colli==kPPDATA) ) && ( c->skim.pVertexFilterCutGplus ==0 ) ) // No Pile up events But it's not on the forest file anymore (Jul 4 2014)
+    //    continue;
     if ( (vzBin<1) || ( vzBin > nVtxBin) )
       continue;
 
@@ -588,6 +610,7 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
     // Select the leading photon
     gj.clear();
     int leadingIndex=-1;
+
     for (int j=0;j<c->photon.nPhotons;j++) {
       if ( c->photon.pt[j]  < preCutPhotonEt ) continue;
       if ( fabs(c->photon.eta[j]) > cutphotonEta ) continue;
@@ -597,7 +620,7 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
       if ((c->photon.rawEnergy[j]/c->photon.energy[j])<0.5) continue;
 
 
-
+      
       // sort using corrected photon pt
       float theCorrPt= corrPt[j];
       if ( theCorrPt > gj.photonEt) {
@@ -631,7 +654,25 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
     }
 
 
-
+    ///////////////////// 1.0. Gen Particle Tree ///////////////////////////////////
+    nCh = 0;
+    if ( isMC) { 
+      for (int it=0; it< c->genparticle.mult ; it++) {
+	if ( c->genparticle.pt[it] < cuttrkPtSkim )   continue;
+	if (  fabs(c->genparticle.eta[it]) > cuttrkEtaSkim ) continue;
+	if ( c->genparticle.chg[it] == 0 ) continue;
+	//	if ( c->genparticle.sube[it] != 0 ) continue;
+	
+	chPdg[nCh]  = c->genparticle.pdg[it];
+	chChg[nCh]  = c->genparticle.chg[it];
+	chSube[nCh]  = c->genparticle.sube[it];
+	chPt[nCh]  = c->genparticle.pt[it];
+	chEta[nCh]  = c->genparticle.eta[it];
+	chPhi[nCh]  = c->genparticle.phi[it];
+	chDphi[nCh] = getAbsDphi( chPhi[nCh], gj.photonPhi) ;
+	nCh++;}
+    }
+    
     ///////////////////// Jet tree ///////////////////////////////////
     nJet = 0 ;
     int jetEntries = 0;
@@ -641,7 +682,7 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
     int nSmear = 1;
     if(smearingCentBin != -1)
       nSmear = 100;
-
+    
     for (int ij=0; ij< jetEntries ; ij++) {
       if ( gj.photonEt < 0 )    continue ;    // If there is no photon in this event
       for(int iSmear =0; iSmear < nSmear; iSmear++){
@@ -776,7 +817,6 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
       nTrk++;}
     
     
-    
     nMJet = 0;
     nMTrk = 0;
     nMmTrk = 0;
@@ -785,6 +825,10 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
     int loopCounter=0;
     if ( (!doMix) || ( gj.photonEt < 0) )
       iMix = nMixing1+1;   // Mixing step will be skipped
+
+
+
+
 
     while (iMix<nMixing1)  {
       loopCounter++;
@@ -925,6 +969,7 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
     tmixTrk->Fill();
     tmmixTrk->Fill();
     newtreePhoton->Fill();
+    if ( isMC ) treeChg->Fill();
   }
   
   

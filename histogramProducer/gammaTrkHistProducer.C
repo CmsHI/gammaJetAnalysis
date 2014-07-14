@@ -46,7 +46,7 @@ void gammaTrkSingle(     GjSpectra* gjSpec_=nullGj,
 fitResult getPurity(TString fname="", sampleType collision=kHIDATA, TCut candEvtCut = "", TCut sbEvtCut="", TString ccanvasName="",float photonPtThr=60, float photonPtThrUp=9999);
 
 
-void gammaTrkHistProducer(sampleType collision = kHIDATA, float photonPtThr=40, float photonPtThrUp=9999, int icent =10030){
+void gammaTrkHistProducer(sampleType collision = kPPDATA, float photonPtThr=20, float photonPtThrUp=9999, int icent =7){
   TH1::SetDefaultSumw2();
   
   TString stringSampleType = getSampleName(collision); "";
@@ -106,7 +106,7 @@ void gammaTrkHistProducer(sampleType collision = kHIDATA, float photonPtThr=40, 
   if ( collision == kHIDATA)      fname = fnameHIDATA; //
   else if ( collision == kPADATA) fname = fnamePADATA;
   else if ( collision == kPPDATA) {
-    if ( icent == 7 ) fname = fnamePPDATA;
+    if  ( icent == 7 ) fname = fnamePPDATA;
     else if ( icent == 10010 ) fname = fnamePPDATA0010;
     else if ( icent == 11030 ) fname = fnamePPDATA1030;
     else if ( icent == 13050 ) fname = fnamePPDATA3050;
@@ -124,9 +124,13 @@ void gammaTrkHistProducer(sampleType collision = kHIDATA, float photonPtThr=40, 
   
   TString canvasName = Form("gifs/purity_%s_output_icent%d_photonPtThr%d-%d", stringSampleType.Data(),  (int)icent, (int)photonPtThr, (int)photonPtThrUp);
   
-  fitResult fitr = getPurity(fname, collision, evtSeltCut, sbSeltCut, canvasName, photonPtThr, photonPtThrUp);
-  purity = fitr.purity010;
-  
+  if ( collision == kPPDATA) {  
+    purity = 0.85;
+  }
+  else {
+    fitResult fitr = getPurity(fname, collision, evtSeltCut, sbSeltCut, canvasName, photonPtThr, photonPtThrUp);
+    purity = fitr.purity010;
+  }
   GjSpectra* gSpec = new GjSpectra();
   gSpec->init(Form("icent%d",(int)icent) );
   tgj->Draw2(gSpec->hPtPhoCand,  "photonEt", phoCandCut, "");

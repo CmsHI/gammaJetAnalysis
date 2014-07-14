@@ -233,6 +233,27 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
   treeChg->Branch("chg",chChg,"chg[nCh]/I");
 
 
+  
+  // 2.0. Background gen charged particle tree
+  int nMCh;
+  int  mChPdg[MAXMTRK];  // associaated Jet pT
+  int  mChChg[MAXMTRK];  // associated Jet pT
+  float mChPt[MAXMTRK];
+  float mChEta[MAXMTRK];
+  float mChPhi[MAXMTRK];
+  float mChDphi[MAXMTRK];
+
+  TTree * tmixChg = new TTree("mCh","charged gen particles from minbias events");
+  if ( isMC ) { 
+    tmixChg->SetMaxTreeSize(MAXTREESIZE);
+    tmixChg->Branch("nCh",&nMCh,"nCh/I");
+    tmixChg->Branch("pdg",mChPdg,"pdg[nCh]/I");
+    tmixChg->Branch("chg",mChChg,"chg[nCh]/I");
+    tmixChg->Branch("pt",mChPt,"pt[nCh]/F");
+    tmixChg->Branch("eta",mChEta,"eta[nCh]/F");
+    tmixChg->Branch("phi",mChPhi,"phi[nCh]/F");
+    tmixChg->Branch("dphi",mChDphi,"dphi[nCh]/F");
+  }
 
   // 2.1 Background jet tree 
   int nMJet;
@@ -325,6 +346,22 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
   EvtSel evtImb;
   TBranch        *b_evt;
 
+  // 3.0. gen particles
+  const int nMaxCh=3000;
+  Int_t           nChImb;
+  Float_t         chPtImb[nMaxCh];   //Imb[nCh]
+  Float_t         chEtaImb[nMaxCh];   //Imb[nCh]
+  Float_t         chPhiImb[nMaxCh];   //Imb[nCh]
+  Int_t           chPdgImb[nMaxCh];   //Imb[nCh]
+  Int_t           chChgImb[nMaxCh];   //Imb[nCh]
+
+  TBranch        *b_nChImb;   //!
+  TBranch        *b_chPtImb;   //!
+  TBranch        *b_chEtaImb;   //!
+  TBranch        *b_chPhiImb;   //!
+  TBranch        *b_chPdgImb;   //!
+  TBranch        *b_chChgImb;   //!
+
   // 3.1. Jets
   Int_t           nJetImb;
   Float_t         jetPtImb[MAXJET];
@@ -347,6 +384,7 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
   TBranch        *b_jetRefPhiImb;
   TBranch        *b_jetRefPartonPtImb;
   TBranch        *b_jetRefPartonFlvImb;
+
 
   
   // 3.2. Tracks  
@@ -388,6 +426,8 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
   TBranch        *b_mTrkAsJetDRImb;
 
   
+  
+  
   int nCentBins =  nCentBinSkim;
   if ((colli==kPADATA)||(colli==kPAMC)) {
     nCentBins = nCentBinSkimPA;
@@ -406,6 +446,15 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
 	tjmb[icent][ivz]->Add(MinbiasFname.data());
 	tjmb[icent][ivz]->SetBranchAddress("evt", &evtImb,&b_evt);
 
+	//  3.0. charged gen particles
+	if ( isMC) {
+	  tjmb[icent][ivz]->SetBranchAddress("nCh",   &nChImb,   &b_nChImb);
+	  tjmb[icent][ivz]->SetBranchAddress("chPt",  &chPtImb,  &b_chPtImb);
+	  tjmb[icent][ivz]->SetBranchAddress("chEta",  &chEtaImb,  &b_chEtaImb);
+	  tjmb[icent][ivz]->SetBranchAddress("chPhi",  &chPhiImb,  &b_chPhiImb);
+	  tjmb[icent][ivz]->SetBranchAddress("chPdg",  &chPdgImb,  &b_chPdgImb);
+	  tjmb[icent][ivz]->SetBranchAddress("chChg",  &chChgImb,  &b_chChgImb);
+	}
 	//  3.1. jets
 	tjmb[icent][ivz]->SetBranchAddress("nJet",   &nJetImb,   &b_nJetImb);
 	tjmb[icent][ivz]->SetBranchAddress("jetPt",  &jetPtImb,  &b_jetPtImb);
@@ -554,7 +603,7 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
 
 
     eSel++;      // OK.  This event is a collisional and no-noise event.
-    
+      
     // Reweight for vertex and centrality of MC 
     evt.vtxCentWeight = 1;
     double wVtx=1;
@@ -606,7 +655,7 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
 
     TMath::Sort(c->photon.nPhotons, newPt, order);
 
-
+  
     // Select the leading photon
     gj.clear();
     int leadingIndex=-1;
@@ -653,7 +702,7 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
       gj.photonEta = - gj.photonEta;
     }
 
-
+    
     ///////////////////// 1.0. Gen Particle Tree ///////////////////////////////////
     nCh = 0;
     if ( isMC) { 
@@ -671,7 +720,7 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
 	chPhi[nCh]  = c->genparticle.phi[it];
 	chDphi[nCh] = getAbsDphi( chPhi[nCh], gj.photonPhi) ;
 	nCh++;}
-    }
+    }  
     
     ///////////////////// Jet tree ///////////////////////////////////
     nJet = 0 ;
@@ -696,7 +745,7 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
 	  jetEta[nJet] = theJet->jteta[ij];
 	  jetPhi[nJet] = theJet->jtphi[ij];
 	}
-	
+      	
 	// Smear phi
 	Double_t newPhi = jetPhi[nJet] ;
 	if( smearingCentBin != -1 )
@@ -733,7 +782,7 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
 	if ( (colli==kPADATA) && ( evt.run > 211256 ) )  {
 	  jetEta[nJet] = -jetEta[nJet];
 	}
-
+      
 	// Jet kinematic cuts //////////////////////////////////////////////
 	if ( jetPt[nJet] < cutjetPtSkim) 
 	  continue;
@@ -786,7 +835,7 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
       
       nJet++ ;
     }
-
+  
     ///////////////////// 1.2. Track tree ///////////////////////////////////
     nTrk = 0 ;
     for (int it=0; it< c->track.nTrk ; it++) {
@@ -820,16 +869,14 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
     nMJet = 0;
     nMTrk = 0;
     nMmTrk = 0;
+    nMCh   =0 ;
     bool noSuchEvent = false;
     int iMix=0;
     int loopCounter=0;
     if ( (!doMix) || ( gj.photonEt < 0) )
-      iMix = nMixing1+1;   // Mixing step will be skipped
-
-
-
-
-
+      iMix = nMixing1+1;   // Mixing step will
+    
+    
     while (iMix<nMixing1)  {
       loopCounter++;
       if ( loopCounter > nMB[cBinSkim][vzBin]+1) { 
@@ -842,16 +889,15 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
 	cout << ",  pBin = " << evt.pBin << endl;
 	continue;
       }
-  
-
+    
       mbItr[cBinSkim][vzBin] = mbItr[cBinSkim][vzBin] + 1;
       if ( mbItr[cBinSkim][vzBin] == nMB[cBinSkim][vzBin] )
 	mbItr[cBinSkim][vzBin] =  mbItr[cBinSkim][vzBin] - nMB[cBinSkim][vzBin];
-
+      
       tjmb[cBinSkim][vzBin]->GetEntry(mbItr[cBinSkim][vzBin]);
       // ok found the event!! ///////////
       loopCounter =0;  // Re-initiate loopCounter
-
+      
       // Jet mixing
       for (int it = 0 ; it < nJetImb ; it++) {
 	// Smear phi
@@ -880,8 +926,8 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
 	}
 	float smearedCorrected  = smeared *l2l3Corr / resCorrection; 
 	/////////////////////////////////////////////////////////////
-
-
+	
+	
 	if ( smearedCorrected < cutjetPtSkim )  // double cutjetPtSkim = 15; Oct 19th
 	  continue;
 	if ( fabs( jetEtaImb[it] ) > cutjetEtaSkim )   // double cutjetEtaSkim = 3.0; Oct 19th
@@ -905,7 +951,23 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
 	}
 	nMJet++; // < == Important!
       }
-      
+
+          
+      // 3.2.0 Gen Particles
+      if ( isMC) {
+	for (int it = 0 ; it < nChImb ; it++) {
+	  if (  chPtImb[it] < cuttrkPtSkim )   continue;
+	  if (  fabs(chEtaImb[it]) > cuttrkEtaSkim ) continue;
+	  if (  chChgImb[it] == 0 ) continue;
+	  mChPdg[nMCh]  = chPdgImb[it];
+	  mChChg[nMCh]  = chChgImb[it];
+	  mChPt[nMCh]  = chPtImb[it];
+	  mChEta[nMCh]  = chEtaImb[it];
+	  mChPhi[nMCh]  = chPhiImb[it];
+	  mChDphi[nMCh] = getAbsDphi( chPhiImb[it], gj.photonPhi) ;
+	  nMCh++;}
+      }
+          
       // 3.2.1 Tracks  - 1st kind tracks
       for (int it = 0 ; it < nTrkImb ; it++) {
 	if ( trkPtImb[it] < cuttrkPtSkim )   continue;
@@ -932,7 +994,7 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
 	
 	nMTrk++;}
 
-
+      
       // 3.2.1 Tracks  - 2nd kind tracks
       for (int it = 0 ; it < nMTrkImb ; it++) {
 	if ( mTrkPtImb[it] < cuttrkPtSkim )   continue;
@@ -957,10 +1019,9 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
 	  mmTrkAsJetDR[nMmTrk] =getDR( mmTrkEta[nMmTrk], mmTrkPhi[nMmTrk], theJet->jteta[assocJetId], theJet->jtphi[assocJetId]) ;
 	}
 	nMmTrk++;}
+      
       iMix++;}
-    
-    
-    
+  
     
     tgj->Fill();
     newtreeJet->Fill();
@@ -969,9 +1030,11 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
     tmixTrk->Fill();
     tmmixTrk->Fill();
     newtreePhoton->Fill();
-    if ( isMC ) treeChg->Fill();
-  }
-  
+    if ( isMC )   {
+      treeChg->Fill();
+      tmixChg->Fill();
+    }
+  }  
   
   
   newfile_data->Write();
@@ -979,6 +1042,7 @@ void forest2yskim_jetSkim_forestV3(TString inputFile_="forestFiles/HiForest4/hiF
   cout << " Done! "<< endl;
   cout << "    " << eSel<<" out of total "<<eTot<<" events were analyzed."<<endl;
 }
+
 
 
 

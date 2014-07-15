@@ -57,13 +57,17 @@ void isolationBias() {
   TH1D* hdphiPP[10];     
   TH1D* hdphiHI[10];     
   TH1D* hdphiHIch[10];     
+  TH1D* hdphiHIBkgCh[10];     
+
   for ( int iIso=0; iIso<=kSumIso;iIso++) {
     hdphiPP[iIso] = new TH1D(Form("hdphiPP_iso%d",iIso),";dphi; dN^{ch}/dN{photon}",40,0,3.141592);
     hdphiHI[iIso] = (TH1D*) hdphiPP[iIso]->Clone( Form("hdphiHI_iso%d",iIso) ); 
     hdphiHIch[iIso] = (TH1D*) hdphiPP[iIso]->Clone( Form("hdphiHI_chargedGenParticle_iso%d",iIso) ); 
+    hdphiHIBkgCh[iIso] = (TH1D*) hdphiPP[iIso]->Clone( Form("hdphiHI_chargedGenParticle_Bkg_iso%d",iIso) ); 
     TCut photonCut  = isoCut[iIso] && " cBin<20 && photonEt>20 && abs(photonEta)<1.44 && hovere<0.1 && sigmaIetaIeta<0.01";
     TCut trackCut = "pt>0";
     TCut genpCut  = "pt>0 && sube==0";
+    TCut genpBkgCut  = "pt>0 && sube!=0";
     
     tTrkPP->Draw( Form("dphi>>%s",hdphiPP[iIso]->GetName()), photonCut && trackCut ) ;
     hdphiPP[iIso]->Scale( 1./ (tgjPP->GetEntries(photonCut)) );
@@ -71,6 +75,9 @@ void isolationBias() {
     hdphiHI[iIso]->Scale( 1./ (tgjHI->GetEntries(photonCut)) );
     tChHI->Draw( Form("dphi>>%s",hdphiHIch[iIso]->GetName()), photonCut && genpCut ) ;
     hdphiHIch[iIso]->Scale( 1./ (tgjHI->GetEntries(photonCut)) );
+
+    tChHI->Draw( Form("dphi>>%s",hdphiHIBkgCh[iIso]->GetName()), photonCut && genpBkgCut ) ;
+    hdphiHIBkgCh[iIso]->Scale( 1./ (tgjHI->GetEntries(photonCut)) );
   }
 
 
@@ -100,6 +107,13 @@ void isolationBias() {
   cleverRange(hdphiHIch[kGen],1.5);
   hdphiHIch[kGen]->Draw("hist");
   hdphiHIch[kSumIso]->Draw("same e");
+
+  TCanvas* c4 = new TCanvas("c4","",400,400);
+  handsomeTH1(  hdphiHIBkgCh[kGen],1);
+  handsomeTH1(  hdphiHIBkgCh[kSumIso],2);
+  cleverRange(hdphiHIBkgCh[kGen],1.5);
+  hdphiHIBkgCh[kGen]->Draw("hist");
+  hdphiHIBkgCh[kSumIso]->Draw("same e");
   
   
   

@@ -38,7 +38,7 @@ g++ makeGammaJetNTuple.C $(root-config --cflags --libs) -Werror -Wall -g -o make
 # hadd -f "gammaJets_pp_MC_EmEnrichedDijet.root" gammaJets_pp_MC_EmEnrichedDijet*.root
 # echo "done pp MC"
 
-./makeGammaJetNTuple.exe "/mnt/hadoop/cms/store/user/goyeonju/MC_Production/PYTHIA/pp_2760GeV/forest/pp2760_pyquen_emDijet30to50_forestv85_20130915.root" 3 "test_out.root" 1
+#./makeGammaJetNTuple.exe "/mnt/hadoop/cms/store/user/goyeonju/MC_Production/PYTHIA/pp_2760GeV/forest/pp2760_pyquen_emDijet30to50_forestv85_20130915.root" 3 "test_out.root" 1
 
 # # pA
 # MCWEIGHT=(1 0.0890448 0.0228245 0.00493548)
@@ -71,5 +71,5 @@ g++ makeGammaJetNTuple.C $(root-config --cflags --libs) -Werror -Wall -g -o make
 # echo "Done pA data"
 
 # # PbPb
-# ./makeGammaJetNTuple.exe "SAMPLES/pbpbPhotonDATA.root" 0 "gammaJets_PbPb_Data.root"
+./makeGammaJetNTuple.exe "/mnt/hadoop/cms/store/user/luck/PbPb2011_photons_Data/HiForestPhoton-v7-noDuplicate.root" 0 "gammaJets_PbPb_Data.root"
 # echo "Done PbPb Data"

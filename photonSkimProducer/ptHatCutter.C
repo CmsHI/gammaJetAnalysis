@@ -27,20 +27,21 @@ static const long MAXTREESIZE = 10000000000;
 
 
 
-void ptHatCutter( int ptHatCut1 = 30, int ptHatCut2=50, int genPhotonPtCut =30) {
+void ptHatCutter(TString inputFileName, TString outFileName, collisionType colli = cPPb, int ptHatCut1 = 30, int ptHatCut2=50, int genPhotonPtCut =30) {
   //collisionType
-  collisionType colli = cPPb;
-  TString inputFile_="/home/jazzitup/forestFiles/pp/merged_allQCDPhoton30_50_80_120_CMSSW538HIp2.root";
-  TString outname = Form("merged_allQCDPhoton%dto%d_genPtCut%d_CMSSW538HIp2.root",ptHatCut1,ptHatCut2,genPhotonPtCut);
+
+//  collisionType colli = cPPb;
+//  TString inputFile_="/home/jazzitup/forestFiles/pp/merged_allQCDPhoton30_50_80_120_CMSSW538HIp2.root";
+//  TString outname = Form("merged_allQCDPhoton%dto%d_genPtCut%d_CMSSW538HIp2.root",ptHatCut1,ptHatCut2,genPhotonPtCut);
   
   
   // start from here
   // path length histogram
   
   HiForest * t;
-  t = new HiForest(inputFile_.Data(),"",colli);
+  t = new HiForest(inputFileName.Data(),"",colli);
    
-  t->SetOutputFile(outname.Data());
+  t->SetOutputFile(outFileName.Data());
   // LOOP!!
   t->InitTree();
 
@@ -72,3 +73,29 @@ void ptHatCutter( int ptHatCut1 = 30, int ptHatCut2=50, int genPhotonPtCut =30) 
   delete t;
 }
 
+int main(int argc, char *argv[])
+{
+  if(argc == 7)
+  {
+      ptHatCutter(argv[1],
+              argv[2],
+              (collisionType) atoi(argv[3]),
+              atoi(argv[4]),
+              atoi(argv[5]),
+              atoi(argv[6]));
+    return 0;
+  }
+  else if (argc == 6)
+  {
+      ptHatCutter(argv[1],
+              argv[2],
+              (collisionType) atoi(argv[3]),
+              atoi(argv[4]),
+              atoi(argv[5]));
+    return 0;
+  }
+  else {
+    std::cout << "Wrong number of arguments" << std::endl;
+    return 1;
+  }
+}

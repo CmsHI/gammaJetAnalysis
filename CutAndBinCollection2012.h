@@ -33,7 +33,7 @@ double a1, a2, a3, a4, a5, a6;
 // Updated on Oct 20th.   Jet energy residual correction is done by default.
 ///////////// pp Data
 
-TString fnamePPDATA                  =   "yskimmedFiles/yskim_pp_photonSKimForest_v85_jetNoSmearing.root";
+TString fnamePPDATA                  =   "yskimmedFiles/yskim_pp_Data_localJEC_v3_HiForest_nodupes_noSmearing.root";
 //no Residual correction
 TString fnamePPDATA_noJetResCorr    = "yskimmedFiles/yskim_pp_photonSKimForest_v85_jetNoSmearing_noJetResCorr.root";
 /// jet energy smeared  // Now these are smeared and thn corr by default
@@ -45,10 +45,10 @@ TString fnamePPDATA30100                =   "yskimmedFiles/yskim_pp_Data_localJE
 TString fnamePPDATA0030                =   "yskimmedFiles/yskim_pp_Data_localJEC_v3_HiForest_nodupes_smearingCentBin4.root";
 
 // pp MC
-TString fnamePPMC_AllQcdPho30to50    = "yskimmedFiles/yskim_merged_allQCDPhoton30to50_genPhotonPtCut30_CMSSW538HIp2.root";
-TString fnamePPMC_AllQcdPho50to80    = "yskimmedFiles/yskim_merged_allQCDPhoton50to80_genPhotonPtCut30_CMSSW538HIp2.root";
-TString fnamePPMC_AllQcdPho80to120   = "yskimmedFiles/yskim_merged_allQCDPhoton80to120_genPhotonPtCut30_CMSSW538HIp2.root";
-TString fnamePPMC_AllQcdPho120to9999 = "yskimmedFiles/yskim_merged_allQCDPhoton120to9999_genPhotonPtCut30_CMSSW538HIp2.root";
+TString fnamePPMC_AllQcdPho30to50    = "yskimmedFiles/yskim_pp_MC_AllQCDPhoton30to50_localJEC_53X.root";
+TString fnamePPMC_AllQcdPho50to80    = "yskimmedFiles/yskim_pp_MC_AllQCDPhoton50to80_localJEC_53X.root";
+TString fnamePPMC_AllQcdPho80to120   = "yskimmedFiles/yskim_pp_MC_AllQCDPhoton80to120_localJEC_53X.root";
+TString fnamePPMC_AllQcdPho120to9999 = "yskimmedFiles/yskim_pp_MC_AllQCDPhoton120to999_localJEC_53X.root";
 double  wPPMC_AllQcdPho30to50        = 29329./ 29329.;
 double  wPPMC_AllQcdPho50to80        = 8098. / 87988.;
 double  wPPMC_AllQcdPho80to120       = 1680. / 96756.;
@@ -159,11 +159,11 @@ double wPPMC_emDijet120to9999      = 4284./130444.;
 
 ////////////////////////// pA datasets 2015-01-21
 TString fnamePADATA = "yskimmedFiles/yskim_pPb_Data_all_localJEC_v3_HiForest_nodupes.root";
-TString fnamePAMC_AllQcdPho30to50    = "yskimmedFiles/yskim_pA_AllQCDPhoton3050.root";
-TString fnamePAMC_AllQcdPho50to80    = "yskimmedFiles/yskim_pA_AllQCDPhoton5080.root";
-TString fnamePAMC_AllQcdPho80to120   = "yskimmedFiles/yskim_pA_AllQCDPhoton80120.root";
-TString fnamePAMC_AllQcdPho120to170  = "yskimmedFiles/yskim_pA_AllQCDPhoton120170.root";
-TString fnamePAMC_AllQcdPho170to9999 = "yskimmedFiles/yskim_pA_AllQCDPhoton1709999.root";
+TString fnamePAMC_AllQcdPho30to50    = "yskimmedFiles/yskim_merged_pPb_Pbp_MIX_AllQCDPhoton30_50_80_120_170_localJEC_v3_ptHat_30_50.root";
+TString fnamePAMC_AllQcdPho50to80    = "yskimmedFiles/yskim_merged_pPb_Pbp_MIX_AllQCDPhoton30_50_80_120_170_localJEC_v3_ptHat_50_80.root";
+TString fnamePAMC_AllQcdPho80to120   = "yskimmedFiles/yskim_merged_pPb_Pbp_MIX_AllQCDPhoton30_50_80_120_170_localJEC_v3_ptHat_80_120.root";
+TString fnamePAMC_AllQcdPho120to170  = "yskimmedFiles/yskim_merged_pPb_Pbp_MIX_AllQCDPhoton30_50_80_120_170_localJEC_v3_ptHat_120_170.root";
+TString fnamePAMC_AllQcdPho170to9999 = "yskimmedFiles/yskim_merged_pPb_Pbp_MIX_AllQCDPhoton30_50_80_120_170_localJEC_v3_ptHat_170_999.root";
 
 double  wPAMC_AllQcdPho30to50        = 62744. / 62744. ;
 double  wPAMC_AllQcdPho50to80        = 29499. / 107309. ;

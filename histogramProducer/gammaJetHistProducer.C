@@ -184,6 +184,10 @@ void gammaJetHistProducer(sampleType collision = kPADATA, float photonPtThr=60, 
   }
 
   TString vtxCentReweight = "evt.vtxCentWeight";
+  if(collision == kPPDATA)
+  {
+      vtxCentReweight = "1/100";    // must account for 100 times smearing during "yskim"
+  }
   GjSpectra* gSpec = new GjSpectra();
   gSpec->init(Form("icent%d",(int)icent) );
   tgj->Draw2(gSpec->hPtPhoCand,  "photonEt", phoCandCut, vtxCentReweight)  ;

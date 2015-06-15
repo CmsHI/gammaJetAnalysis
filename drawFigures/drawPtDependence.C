@@ -1,4 +1,4 @@
-#include "../../hiForestV3/hiForest.h"
+#include "../../HiForestAnalysis/hiForest.h"
 #include "../CutAndBinCollection2012.h"
 #include <TRandom3.h>
 #include <time.h>
@@ -75,9 +75,9 @@ void drawPtDependence(TString dirName="nominal", int prodDate=20131021, int jetP
 	    hJetPtIaaBin[icoll][icent][ipt] = (TH1D*)histFile[icoll][ipt]->Get(Form("jetPtForIaa_icent%d_final", centBinHI[icent] ) );
 	    cout << " Getting histogram : " << Form("jetPtForIaa_icent%d_final", centBinHI[icent] ) << endl;
 	    hDphi[icoll][icent][ipt]  = (TH1D*)histFile[icoll][ipt]->Get(Form("jetDphi_icent%d_final", centBinHI[icent] ) ) ;
-	    cout << " Getting histogram : " << Form("jetDphi_icent%d_final", icent)<< endl;
+	    cout << " Getting histogram : " << Form("jetDphi_icent%d_final", centBinHI[icent])<< endl;
 	    hEta[icoll][icent][ipt]  = (TH1D*)histFile[icoll][ipt]->Get(Form("etaJg_icent%d_final", centBinHI[icent] ) ) ;
-	    cout << " Getting histogram : " << Form("etaJg_icent%d_final", icent)<< endl;
+	    cout << " Getting histogram : " << Form("etaJg_icent%d_final", centBinHI[icent])<< endl;
 	  }
 	}
       }
@@ -290,8 +290,8 @@ void drawPtDependence(TString dirName="nominal", int prodDate=20131021, int jetP
     meanXjg[kHIDATA][icent]->Draw("same");
   }
   l1->Draw();
-     c31->SaveAs("figures/pT_dependence_xjg_pp_pbpb_figure1.pdf");
-     c31->SaveAs("figures/pT_dependence_xjg_pp_pbpb_figure1.gif");
+  c31->SaveAs("figures/pT_dependence_xjg_pp_pbpb_figure2.pdf");
+  c31->SaveAs("figures/pT_dependence_xjg_pp_pbpb_figure2.gif");
     
 
   TCanvas* c_rjg = new TCanvas("c_rjg","",500,500);

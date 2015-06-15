@@ -1,9 +1,9 @@
-#include "../../hiForestV3/hiForest.h"
+#include "../../HiForestAnalysis/hiForest.h"
 #include "../CutAndBinCollection2012.h"
 #include <TRandom3.h>
 #include <time.h>
 
-void drawPbPb_pp( bool saveFigures=true) {
+void drawPbPb_pp( bool saveFigures=true, int prodDate=20131021, int jetPtCut=30) {
 
     const int nPtBin = 4;
     double ptBin[nPtBin+1] = {40, 50,60,80,9999}; 
@@ -50,7 +50,7 @@ void drawPbPb_pp( bool saveFigures=true) {
     for (int ipt=1 ; ipt<=nPtBin ; ipt++) {
       for (int icoll=0 ; icoll<4 ; icoll++) {
 	TString sampleName = getSampleName( icoll ) ;
-            char* fname =  Form("ffFiles/photonTrackCorr_%s_output_photonPtThr%d_to_%d_jetPtThr30_20130916.root",sampleName.Data(), (int)ptBin[ipt-1], (int)ptBin[ipt]);
+            char* fname =  Form("ffFiles/photonTrackCorr_%s_output_photonPtThr%d_to_%d_jetPtThr%d_%d.root",sampleName.Data(), (int)ptBin[ipt-1], (int)ptBin[ipt], (int)jetPtCut, prodDate);
             histFile[icoll][ipt] = new TFile(fname) ;
             cout << " Reading file : " << fname << endl;
 
@@ -80,9 +80,9 @@ void drawPbPb_pp( bool saveFigures=true) {
                         hJetPt[icoll][icent][ipt] = (TH1D*)histFile[icoll][ipt]->Get(Form("jetPt_icent%d_final", centBinHI[icent] ) );
                         cout << " Getting histogram : " << Form("jetPt_icent%d_final", centBinHI[icent] ) << endl;
                         hDphi[icoll][icent][ipt]  = (TH1D*)histFile[icoll][ipt]->Get(Form("jetDphi_icent%d_final", centBinHI[icent] ) ) ;
-                        cout << " Getting histogram : " << Form("jetDphi_icent%d_final", icent)<< endl;
+                        cout << " Getting histogram : " << Form("jetDphi_icent%d_final", centBinHI[icent])<< endl;
                         hEta[icoll][icent][ipt]  = (TH1D*)histFile[icoll][ipt]->Get(Form("etaJg_icent%d_final", centBinHI[icent] ) ) ;
-                        cout << " Getting histogram : " << Form("etaJg_icent%d_final", icent)<< endl;
+                        cout << " Getting histogram : " << Form("etaJg_icent%d_final", centBinHI[icent])<< endl;
 			if ( icoll%2 == 1)  {  // if it is MC           
 			  hGenJetPt[icoll][icent][ipt] = (TH1D*)histFile[icoll][ipt]->Get(Form("genJetPt_icent%d_final",centBinHI[icent]));
 			  cout << " Getting histogram : " << Form("genJetPt_icent%d_final", centBinHI[icent] ) << endl;
@@ -154,7 +154,7 @@ void drawPbPb_pp( bool saveFigures=true) {
 	
 	double dx1=0.15;
 	if ( ipt == nPtBin ) 
-	  drawText(Form("p_{T}^{#gamma} < %dGeV, ", (int)ptBin[ipt-1]), 0.12+dx1+0.25,0.85,1,15);//yeonju 130823                          
+	  drawText(Form("p_{T}^{#gamma} > %dGeV, ", (int)ptBin[ipt-1]), 0.12+dx1+0.25,0.85,1,15);//yeonju 130823
         else
 	  drawText(Form("%dGeV < p_{T}^{#gamma} < %dGeV, ", (int)ptBin[ipt-1], (int)ptBin[ipt]), 0.12+dx1,0.85,1,15);//yeonju 130823       
 	
@@ -199,6 +199,9 @@ void drawPbPb_pp( bool saveFigures=true) {
     hTempPt->GetYaxis()->SetTitleOffset(1.35);
     handsomeTH1(hTempPt,0);
     
+    c1->SaveAs("figures/drawPbPb_pp_hDphi.pdf");
+    c1->SaveAs("figures/drawPbPb_pp_hDphi.gif");
+
     TCanvas* c2 = new TCanvas("c2_jetPt","",1200,350);
     makeMultiPanelCanvas(c2,nPtBin,1,0.0,0.0,0.2,0.15,0.02);
     for ( int ipt = 1 ; ipt<=nPtBin  ; ipt++) {
@@ -239,6 +242,9 @@ void drawPbPb_pp( bool saveFigures=true) {
       
       onSun(30,0,200,0);
     }
+
+    c2->SaveAs("figures/drawPbPb_pp_hJetPt.pdf");
+    c2->SaveAs("figures/drawPbPb_pp_hJetPt.gif");
 
 
     TCanvas* c3 = new TCanvas("c3_GenjetPt","",1200,350);
@@ -282,6 +288,8 @@ void drawPbPb_pp( bool saveFigures=true) {
       onSun(30,0,200,0);
     }
     
+    c3->SaveAs("figures/drawPbPb_pp_hGenJetPt.pdf");
+    c3->SaveAs("figures/drawPbPb_pp_hGenJetPt.gif");
     
       
     TCanvas* c101 = new TCanvas("c101_xjg","",1200,350);
@@ -331,6 +339,8 @@ void drawPbPb_pp( bool saveFigures=true) {
       
       onSun(30,0,200,0);
     }
+    c101->SaveAs("figures/drawPbPb_pp_hxjg.pdf");
+    c101->SaveAs("figures/drawPbPb_pp_hxjg.gif");
 
 
     TCanvas* c32 = new TCanvas("c32","",500,500);
@@ -355,6 +365,8 @@ void drawPbPb_pp( bool saveFigures=true) {
       l1mc->AddEntry(meanXjg[kHIMC][1],"PYTHIA+HYDJET 0-30%","p");
       l1mc->Draw();
     }
+    c32->SaveAs("figures/drawPbPb_pp_meanXjg_kPPMC_7.pdf");
+    c32->SaveAs("figures/drawPbPb_pp_meanXjg_kPPMC_7.gif");
 
     TCanvas* c33 = new TCanvas("c33","",500,500);
     handsomeTH1(meanJetPt[kPPMC][7], 1);
@@ -369,6 +381,8 @@ void drawPbPb_pp( bool saveFigures=true) {
         if ( icent == 2 ) meanJetPt[kHIMC][icent]->SetMarkerStyle(24);
 	meanJetPt[kHIMC][icent]->Draw("same");
     }
+    c33->SaveAs("figures/drawPbPb_pp_meanJetPt_kPPMC_7.pdf");
+    c33->SaveAs("figures/drawPbPb_pp_meanJetPt_kPPMC_7.gif");
 
     if (1 == 1) {
       TLegend *l1mc = new TLegend(0.3810484,0.1864407,0.891129,0.4004237,NULL,"brNDC");
@@ -401,6 +415,8 @@ void drawPbPb_pp( bool saveFigures=true) {
       l1mc->AddEntry(meanGenJetPt[kHIMC][1],"PYTHIA+HYDJET 0-30%","p");
       l1mc->Draw();
     }
+    c33_genJet->SaveAs("figures/drawPbPb_pp_meanGenJetPt_kPPMC_7.pdf");
+    c33_genJet->SaveAs("figures/drawPbPb_pp_meanGenJetPt_kPPMC_7.gif");
 
     TCanvas* c34 = new TCanvas("c34","",500,500);
     handsomeTH1(rjg[kPPMC][7], 1);
@@ -424,6 +440,8 @@ void drawPbPb_pp( bool saveFigures=true) {
       l1mc->AddEntry(rjg[kHIMC][1],"PYTHIA+HYDJET 0-30%","p");
       l1mc->Draw();
     }
+    c34->SaveAs("figures/drawPbPb_pp_rjg_kPPMC_7.pdf");
+    c34->SaveAs("figures/drawPbPb_pp_rjg_kPPMC_7.gif");
 
     TCanvas* c34_genJet = new TCanvas("c34_genJet","",500,500);
     handsomeTH1(rGenjg[kPPMC][7], 1);
@@ -447,7 +465,8 @@ void drawPbPb_pp( bool saveFigures=true) {
       l1mc->AddEntry(rGenjg[kHIMC][1],"PYTHIA+HYDJET 0-30%","p");
       l1mc->Draw();
     }
-
+    c34_genJet->SaveAs("figures/drawPbPb_pp_rGenjg_kPPMC_7.pdf");
+    c34_genJet->SaveAs("figures/drawPbPb_pp_rGenjg_kPPMC_7.gif");
     
 } 
 

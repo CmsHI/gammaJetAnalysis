@@ -60,7 +60,7 @@ void drawPtDependencePA(TString dirName="nominal", int prodDate=20131021, int je
 		    hDphi[icoll][icent][ipt]  = (TH1D*)histFile[icoll][ipt]->Get(Form("jetDphi_icent%d_final", icent)) ;
                     cout << " Getting histogram : " << Form("jetDphi_icent%d_final", icent) << endl;
                     //hEta[icoll][icent][ipt]  = (TH1D*)histFile[icoll][ipt]->Get(Form("etaJg_icent%d_final", icent)) ;
-                    cout << " Getting histogram : " << Form("etaJg_icent%d_final", icent) << endl;
+                    //cout << " Getting histogram : " << Form("etaJg_icent%d_final", icent) << endl;
 
                 }
 
@@ -71,12 +71,12 @@ void drawPtDependencePA(TString dirName="nominal", int prodDate=20131021, int je
                     hJetPt[icoll][icent][ipt] = (TH1D*)histFile[icoll][ipt]->Get(Form("jetPt_icent%d_final", icent)) ;
                     cout << " Getting histogram : " << Form("jetPt_icent%d_final", icent) << endl;
 		    hJetPtIaaBin[icoll][icent][ipt] = (TH1D*)histFile[icoll][ipt]->Get(Form("jetPtForIaa_icent%d_final", icent ) ) ;
-		    cout << " Getting histogram : " << Form("jetPtForIaa_icent%d_final", centBinHI[icent] ) << endl;
+		    cout << " Getting histogram : " << Form("jetPtForIaa_icent%d_final", icent ) << endl;
 
 		    hDphi[icoll][icent][ipt]  = (TH1D*)histFile[icoll][ipt]->Get(Form("jetDphi_icent%d_final", icent)) ;
                     cout << " Getting histogram : " << Form("jetDphi_icent%d_final", icent) << endl;
                     //hEta[icoll][icent][ipt]  = (TH1D*)histFile[icoll][ipt]->Get(Form("etaJg_icent%d_final", icent)) ;
-                    cout << " Getting histogram : " << Form("etaJg_icent%d_final", icent) << endl;
+                    //cout << " Getting histogram : " << Form("etaJg_icent%d_final", icent) << endl;
 
                 }
 
@@ -89,9 +89,9 @@ void drawPtDependencePA(TString dirName="nominal", int prodDate=20131021, int je
                         hJetPtIaaBin[icoll][icent][ipt] = (TH1D*)histFile[icoll][ipt]->Get(Form("jetPtForIaa_icent%d_final", centBinHI[icent] ) );
                         cout << " Getting histogram : " << Form("jetPtForIaa_icent%d_final", centBinHI[icent] ) << endl;
                         hDphi[icoll][icent][ipt]  = (TH1D*)histFile[icoll][ipt]->Get(Form("jetDphi_icent%d_final", centBinHI[icent] ) ) ;
-                        cout << " Getting histogram : " << Form("jetDphi_icent%d_final", icent)<< endl;
+                        cout << " Getting histogram : " << Form("jetDphi_icent%d_final", centBinHI[icent])<< endl;
                         //hEta[icoll][icent][ipt]  = (TH1D*)histFile[icoll][ipt]->Get(Form("etaJg_icent%d_final", centBinHI[icent] ) ) ;
-                        cout << " Getting histogram : " << Form("etaJg_icent%d_final", icent)<< endl;
+                        //cout << " Getting histogram : " << Form("etaJg_icent%d_final", centBinHI[icent])<< endl;
                     }
                 }
             }
@@ -152,16 +152,14 @@ void drawPtDependencePA(TString dirName="nominal", int prodDate=20131021, int je
     }
     c1->cd(1);
 
-    if (saveFigures) c1->SaveAs("figures/pT_dependence_dphi_pA_figure1.gif");
-    if (saveFigures) c1->SaveAs("figures/pT_dependence_dphi_pA_figure1.pdf");
-
     TLegend *l1 = new TLegend(0.2199474,0.5971384,0.7283974,0.8119819,NULL,"brNDC");
     easyLeg(l1,"5.02TeV");
     l1->AddEntry(hDphi[kPAMC][1][1],"pA pythia+HIJING ","p");
     l1->AddEntry(hDphi[kPADATA][1][1],"pA Data","p");
     l1->Draw();
 
-
+    if (saveFigures) c1->SaveAs("figures/pT_dependence_dphi_pA_figure1.gif");
+    if (saveFigures) c1->SaveAs("figures/pT_dependence_dphi_pA_figure1.pdf");
 
     TH1D* hTempPt = new TH1D("hTemp",";p_{T}^{#gamma} (GeV);",200,10,300);
 

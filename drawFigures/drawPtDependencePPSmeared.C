@@ -1,9 +1,9 @@
-#include "../../hiForestV3/hiForest.h"
+#include "../../HiForestAnalysis/hiForest.h"
 #include "../CutAndBinCollection2012.h"
 #include <TRandom3.h>
 #include <time.h>
 
-void drawPtDependencePPSmeared(int centBin = 10030, TString dirName="nominal", int prodDate=20131021 ) {
+void drawPtDependencePPSmeared(int centBin = 10030, TString dirName="nominal", int prodDate=20131021, int jetPtCut=30) {
   TH1::SetDefaultSumw2();
 
   const int nPtBin = 4;
@@ -44,7 +44,7 @@ void drawPtDependencePPSmeared(int centBin = 10030, TString dirName="nominal", i
   for (int ipt=1 ; ipt<=nPtBin ; ipt++) {
     for (int icoll=0 ; icoll<6 ; icoll++) {
       TString sampleName = getSampleName( icoll ) ;
-      char* fname =  Form("ffFiles/%s/photonTrackCorr_%s_output_photonPtThr%d_to_%d_jetPtThr%d_%d.root",dirName.Data(), sampleName.Data(), (int)ptBin[ipt-1], (int)ptBin[ipt], 30, prodDate);
+      char* fname =  Form("ffFiles/%s/photonTrackCorr_%s_output_photonPtThr%d_to_%d_jetPtThr%d_%d.root",dirName.Data(), sampleName.Data(), (int)ptBin[ipt-1], (int)ptBin[ipt], (int)jetPtCut, prodDate);
 
       histFile[icoll][ipt] = new TFile(fname) ;
       cout << " Reading file : " << fname << endl;

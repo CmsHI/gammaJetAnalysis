@@ -1,4 +1,4 @@
-//#include "../../hiForestV3/hiForest.h"
+//#include "../../HiForestAnalysis/hiForest.h"
 #include "../CutAndBinCollection2012.h"
 #include <TRandom3.h>
 #include <time.h>

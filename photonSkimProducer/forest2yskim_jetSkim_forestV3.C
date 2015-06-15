@@ -25,7 +25,7 @@ using namespace std;
 static const int MAXTRK  = 10000;   // This is very enough.
 static const int MAXMTRK = 30000;   // Again this is very enough for 10 mixing
 static const int MAXMJET = 2000;
-static const long MAXTREESIZE = 10000000000;
+static const long MAXTREESIZE = 100000000000;   // set maximum tree size from 10 GB to 100 GB, so that the code does not switch to a new file after 10 GB
 
 
 vector<jetKinem> nullVec;

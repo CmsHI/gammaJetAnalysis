@@ -32,13 +32,13 @@ const int khimc=0;
 const int khidata=1;
 const int kppdata=2;
 const int kppdata13=3;
-const int kppmc=10; // z2 tune 
+const int kppmc=10; // z2 tune
 
 void DivideTG(TGraphAsymmErrors* g1=0,TGraphAsymmErrors* g2=0) {
   for (int i=0;i<g1->GetN();i++) {
     double theX1,val1,theX2,val2;
     if ( theX1 != theX2 ) 
-      { cout <<" error in DivideTG!!!!!" << endl;};
+      { std::cout <<" error in DivideTG!!!!!" << std::endl;};
     g1->GetPoint(i,theX1,val1);
     g2->GetPoint(i,theX2,val2);
     g1->SetPoint(i,theX1,val1/val2);
@@ -46,7 +46,7 @@ void DivideTG(TGraphAsymmErrors* g1=0,TGraphAsymmErrors* g2=0) {
 }
 
 
-void updateHIN11010(int etPho = 60, int etJet = 30, bool scaleByR=true, bool drawMC=true) { 
+void updateHIN11010(int etPho = 60, int etJet = 30, bool scaleByR=true, bool drawMC=true, int prodDate=20131021) {
   bool mcOnly=false;
 
   int percentBin[5] = {0,10,30,50,100};
@@ -104,7 +104,7 @@ void updateHIN11010(int etPho = 60, int etJet = 30, bool scaleByR=true, bool dra
   hdphipp[kppdata] = (TH1D*)fSum3->Get("dataSrc2_reco1_cent0SubtractedExtrapExtrapNorm");
   
   // 2013 pp data!!!!!!
-  TFile* pp13 = new TFile("ffFilesPP60GeVInclusive/photonTrackCorr_ppDATA_output_photonPtThr60_to_9999_jetPtThr30_20131021.root");
+  TFile* pp13 = new TFile(Form("ffFilesPP60GeVInclusive/photonTrackCorr_ppDATA_output_photonPtThr60_to_9999_jetPtThr30_%d.root", prodDate));
   // TFile* pp13 = new TFile("ffFilesPP60GeVInclusive/oldSmearing.root");
 
   hdphi[kppdata13][1] =  (TH1D*)pp13->Get("jetDphi_icent10010_final");
@@ -119,7 +119,7 @@ void updateHIN11010(int etPho = 60, int etJet = 30, bool scaleByR=true, bool dra
   hxgj[kppdata13][5] = (TH1D*)pp13->Get("xjg_icent7_final");
   
 
-  for ( int icent  = 1 ; icent<=5 ; icent++) { 
+  for ( int icent  = 1 ; icent<=5 ; icent++) {
     hdphi[kppdata13][icent]->Scale(1./hdphi[kppdata13][icent]->Integral());
     for ( int i = 1 ; i<=5 ; i++) {
       hdphi[kppdata13][icent]->SetBinContent(i,-1e4);
@@ -223,16 +223,16 @@ void updateHIN11010(int etPho = 60, int etJet = 30, bool scaleByR=true, bool dra
 
     if (scaleByR)    {
       hxgj[kppdata13][icent+1]->Scale(hRpp2013[icent+1]->GetBinContent(1));
-      cout <<"  Scaled by pp R :" << hRpp2013[icent+1]->GetBinContent(1) << endl;
+      std::cout <<"  Scaled by pp R :" << hRpp2013[icent+1]->GetBinContent(1) << std::endl;
       
       double x,y;
       rxhidata->GetPoint(icent, x,y);
       hxgj[khidata][icent]->Scale(y);
-      cout << " scaled by PbPb R: " << y << endl;
+      std::cout << " scaled by PbPb R: " << y << std::endl;
 
       rxhimc->GetPoint(icent, x,y);
       hxgj[khimc][icent]->Scale(y);
-      cout << " scaled by PbPb R: " << y << endl;      
+      std::cout << " scaled by PbPb R: " << y << std::endl;
     }
     if(drawMC) hxgj[khimc][icent]->DrawCopy("hist same");
 
@@ -396,7 +396,7 @@ void updateHIN11010(int etPho = 60, int etJet = 30, bool scaleByR=true, bool dra
     fdphi->SetLineColor(kBlue); 
     // float dphiWidth = fdphi->GetParameter("width");
     // float dphiWidthErr = fdphi->GetParError(0);
-    // cout << " dphiWidth,dphiWidthErr = " << dphiWidth <<"   "<< dphiWidthErr << endl;
+    // std::cout << " dphiWidth,dphiWidthErr = " << dphiWidth <<"   "<< dphiWidthErr << std::endl;
     hdphi[khimc][icent]->SetAxisRange(1.00001e-3,1,"Y");
     hdphi[khimc][icent]->SetStats(0);
     TH1D* hdphitemp = (TH1D*)hdphi[khimc][icent]->Clone(Form("hdphitemp55_%d",icent));
@@ -695,17 +695,17 @@ void updateHIN11010(int etPho = 60, int etJet = 30, bool scaleByR=true, bool dra
   //c4->SaveAs("plotPPPbPb/inclusivePt_ppPbPb_dphi_npart.C");
 
    // // print numbers
-   // cout << " Summary of Points for PbPb " << endl;
+   // std::cout << " Summary of Points for PbPb " << std::endl;
    // PrintGraphAndSys(dphihidata,sysDphi);
    // PrintGraphAndSys(mxhidata,sysMx);
    // PrintGraphAndSys(rxhidata,sysR);
 
-   // cout << " Summary of Points for PYTHIA + HYDJET " << endl;
+   // std::cout << " Summary of Points for PYTHIA + HYDJET " << std::endl;
    // PrintGraph(dphihimc);
    // PrintGraph(mxhimc);
    // PrintGraph(rxhimc);
 
-   //   cout << " Summary of Points for pp " << endl;
+   //   std::cout << " Summary of Points for pp " << std::endl;
    //  PrintGraphAndSys(dphippdata[5],sysDphipp);
    //  PrintGraphAndSys(mxppdata[5],sysMxpp);
    // PrintGraphAndSys(rxppdata[5],sysRpp);

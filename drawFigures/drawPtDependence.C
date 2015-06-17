@@ -149,8 +149,8 @@ void drawPtDependence(TString dirName="nominal", int prodDate=20131021, int jetP
   l1->AddEntry(hDphi[kHIDATA][1][1],"PbPb 0-30%","p");
   l1->Draw();
 
-  // c1->SaveAs("figures/pT_dependence_dphi_pp_pbpb_figure1.pdf");
-  // c1->SaveAs("figures/pT_dependence_dphi_pp_pbpb_figure1.gif");
+   c1->SaveAs("figures/pT_dependence_dphi_pp_pbpb_figure1.pdf");
+   c1->SaveAs("figures/pT_dependence_dphi_pp_pbpb_figure1.gif");
 
 
 

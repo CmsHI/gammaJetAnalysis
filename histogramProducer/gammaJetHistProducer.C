@@ -184,10 +184,6 @@ void gammaJetHistProducer(sampleType collision = kPADATA, float photonPtThr=60, 
   }
 
   TString vtxCentReweight = "evt.vtxCentWeight";
-  if(collision == kPPDATA && icent!=7)
-  {
-      vtxCentReweight = "1/100";    // must account for 100 times smearing during "yskim", but not all pp DATA is smeared.
-  }
   GjSpectra* gSpec = new GjSpectra();
   gSpec->init(Form("icent%d",(int)icent) );
   tgj->Draw2(gSpec->hPtPhoCand,  "photonEt", phoCandCut, vtxCentReweight)  ;
@@ -215,9 +211,14 @@ void gammaJetHistProducer(sampleType collision = kPADATA, float photonPtThr=60, 
   tObj[kTrkRaw] = new multiTreeUtil();
   tObj[kTrkBkg] = new multiTreeUtil();
 
+  float weight=1;
+  if(collision == kPPDATA && icent!=7)
+  {
+      weight = 1./100.;    // must account for 100 times smearing during "yskim", but not all pp DATA is smeared.
+  }
   if (  ( collision == kHIDATA)   || ( collision==kPADATA) || ( collision == kPPDATA) ) {
-    tObj[kTrkRaw]->addFile(fname,  "yJet",  evtSeltCut,  1);
-    tObj[kTrkBkg]->addFile(fname,  "mJet",  evtSeltCut,  1);
+    tObj[kTrkRaw]->addFile(fname,  "yJet",  evtSeltCut,  weight);
+    tObj[kTrkBkg]->addFile(fname,  "mJet",  evtSeltCut,  weight);
   }
   else if ( collision == kHIMC ) {
     tObj[kTrkRaw]->addFile(fnameHIMC_AllQcdPho30to50,   "yJet", evtSeltCut, wHIMC_AllQcdPho30to50 ) ;
@@ -546,7 +547,16 @@ int main(int argc, char *argv[])
 			 atof(argv[4]),
 			 atoi(argv[5]));
     return 0;
-  } else {
+  }
+  else if(argc == 5)
+  {
+    gammaJetHistProducer((sampleType) atoi(argv[1]),
+             atof(argv[2]),
+             atof(argv[3]),
+             atof(argv[4]));
+    return 0;
+  }
+  else {
     std::cout << "Wrong number of arguments" << std::endl;
     return 1;
   }

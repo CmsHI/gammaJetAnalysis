@@ -33,16 +33,16 @@ double a1, a2, a3, a4, a5, a6;
 // Updated on Oct 20th.   Jet energy residual correction is done by default.
 ///////////// pp Data
 
-TString fnamePPDATA                  =   "yskimmedFiles/yskim_pp_Data_localJEC_v3_HiForest_nodupes_noSmearing.root";
+TString fnamePPDATA                  =   "yskimmedFiles/yskim_pp_Data_localJEC_v3_HiForest_nodupes_smearingNO.root";
 //no Residual correction
 TString fnamePPDATA_noJetResCorr    = "yskimmedFiles/yskim_pp_photonSKimForest_v85_jetNoSmearing_noJetResCorr.root";
 /// jet energy smeared  // Now these are smeared and thn corr by default
-TString fnamePPDATA0010                  =   "yskimmedFiles/yskim_pp_Data_localJEC_v3_HiForest_nodupes_smearingCentBin0.root";
-TString fnamePPDATA1030                  =   "yskimmedFiles/yskim_pp_Data_localJEC_v3_HiForest_nodupes_smearingCentBin1.root";
-TString fnamePPDATA3050                  =   "yskimmedFiles/yskim_pp_Data_localJEC_v3_HiForest_nodupes_smearingCentBin2.root";
-TString fnamePPDATA5099                 =   "yskimmedFiles/yskim_pp_Data_localJEC_v3_HiForest_nodupes_smearingCentBin3.root";
-TString fnamePPDATA30100                =   "yskimmedFiles/yskim_pp_Data_localJEC_v3_HiForest_nodupes_smearingCentBin5.root";
-TString fnamePPDATA0030                =   "yskimmedFiles/yskim_pp_Data_localJEC_v3_HiForest_nodupes_smearingCentBin4.root";
+TString fnamePPDATA0010                  =   "yskimmedFiles/yskim_pp_Data_localJEC_v3_HiForest_nodupes_smearing0010.root";
+TString fnamePPDATA1030                  =   "yskimmedFiles/yskim_pp_Data_localJEC_v3_HiForest_nodupes_smearing1030.root";
+TString fnamePPDATA3050                  =   "yskimmedFiles/yskim_pp_Data_localJEC_v3_HiForest_nodupes_smearing3050.root";
+TString fnamePPDATA5099                 =   "yskimmedFiles/yskim_pp_Data_localJEC_v3_HiForest_nodupes_smearing5099.root";
+TString fnamePPDATA0030                =   "yskimmedFiles/yskim_pp_Data_localJEC_v3_HiForest_nodupes_smearing0030.root";
+TString fnamePPDATA30100                =   "yskimmedFiles/yskim_pp_Data_localJEC_v3_HiForest_nodupes_smearing3099.root";
 
 // pp MC
 TString fnamePPMC_AllQcdPho30to50    = "yskimmedFiles/yskim_pp_MC_AllQCDPhoton30to50_localJEC_53X.root";

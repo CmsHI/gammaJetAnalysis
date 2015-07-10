@@ -66,7 +66,7 @@ class multiTreeUtil
       ~multiTreeUtil() {
 	 
       }
-      void addFile(TString filename, TString treeName, TCut cut, Float_t scaleFactor=1);
+      void addFile(TString filename, TString treeName, TCut cut, Float_t scaleFactor=1, bool useOriginalError = false);
       void Draw(TH1D* h,TString expression,TCut cut = "" , TString indWeight="", TString opt="");
       void Draw2(TH1D* h,TString expression,TCut cut = "", TString indWeight="", TString opt="",bool hist=true);
       void Draw2D(TH2D* h,TString expression,TCut cut = "", TString indWeight="", TString opt="",bool hist=true);
@@ -84,15 +84,17 @@ class multiTreeUtil
       vector<TCut>    tcuts_;
       vector<Float_t> scaleFactors_;
       int color[100];
+      vector<bool> keepOriginalError_;
 
       void cleanHist(TH1* h);
+      void restoreOriginalError(TH1* h, Float_t scaleFactor);
 
 };
 
 // =========================================================================
 // Add file
 // =========================================================================
-void multiTreeUtil::addFile(TString filename, TString treeName, TCut cut, Float_t scaleFactor)
+void multiTreeUtil::addFile(TString filename, TString treeName, TCut cut, Float_t scaleFactor, bool useOriginalError)
 {
    TFile *f = new TFile(filename.Data());
    TTree *t = (TTree*) f->FindObjectAny(treeName.Data());
@@ -104,6 +106,7 @@ void multiTreeUtil::addFile(TString filename, TString treeName, TCut cut, Float_
       trees_.push_back(t);
       tcuts_.push_back(cut);
       scaleFactors_.push_back(scaleFactor);
+      keepOriginalError_.push_back(useOriginalError);
    }
    else
       cout << " there is no such tree in this file :" << treeName << endl;
@@ -130,6 +133,10 @@ void multiTreeUtil::Draw(TH1D *h, TString expression, TCut cut,TString indWeight
      else
        trees_[i]->Draw(Form("%s>>my_htmp_%d",expression.Data(),i),  Form("(%s) * (%s)", fCut.GetTitle(), indWeight.Data() ) );
      htmp->Scale(scaleFactors_[i]);
+     if(keepOriginalError_[i]==true)
+      {
+          restoreOriginalError(htmp, scaleFactors_[i]);
+      }
       h->Add(htmp);
       delete htmp;
    }
@@ -169,7 +176,12 @@ void multiTreeUtil::Draw2(TH1D *h, TString expression, TCut cut, TString indWeig
        cout << " Var             :  " << expression.Data() << endl;
        cout << "(cut) * (weight) :  " << endl << Form("( %s )     *     ( %s )", fCut.GetTitle(),  indWeight.Data()) << endl;
        cout << " and scale factor = " << double(scaleFactors_[i]) << endl;
-       h->Add(htmp, double(scaleFactors_[i]) );
+       htmp->Scale(scaleFactors_[i]);
+       if(keepOriginalError_[i]==true)
+       {
+           restoreOriginalError(htmp, scaleFactors_[i]);
+       }
+       h->Add(htmp);
        delete htmp;
        //  hComponent[i]=htmp;
      }
@@ -216,6 +228,10 @@ void multiTreeUtil::Draw2D(TH2D *h, TString expression, TCut cut, TString indWei
         trees_[i]->Draw(Form("%s>>%s",expression.Data(),hName.Data()), Form("( %s ) * %s", fCut.GetTitle(),  indWeight.Data()) );
       }
       htmp->Scale(scaleFactors_[i]);
+      if(keepOriginalError_[i]==true)
+      {
+          restoreOriginalError(htmp, scaleFactors_[i]);
+      }
       h->Add(htmp);
       hComponent[i]=htmp;
 
@@ -260,6 +276,10 @@ void multiTreeUtil::Draw3(TH1D *h, TString expression, TCut cut, TString indWeig
 	    trees_[i]->Draw(Form("%s>>%s",expression.Data(),hName.Data()), Form("(%s) * %s", fCut.GetTitle(),  indWeight.Data()) );
 	 //	 htmp->Sumw2();
 	 htmp->Scale(scaleFactors_[i]);
+	 if(keepOriginalError_[i]==true)
+	 {
+	     restoreOriginalError(htmp, scaleFactors_[i]);
+	 }
 	 h->Add(htmp);
 	 hComponent[i]=htmp;
 	 hComponent[i]->SetLineColor(color[i]);
@@ -321,6 +341,16 @@ void multiTreeUtil::cleanHist(TH1* h)
       h->SetBinContent(i,0);
       h->SetBinError(i,0);
    }
+}
+
+void multiTreeUtil::restoreOriginalError(TH1* h, Float_t scaleFactor)
+{
+    int numBins=h->GetNbinsX();
+
+    for(int i=0; i<=numBins+1; ++i)
+    {
+        h->SetBinError(i,h->GetBinError(i)/(TMath::Sqrt(scaleFactor)));
+    }
 }
 
 #endif

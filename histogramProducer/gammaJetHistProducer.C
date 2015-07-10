@@ -212,13 +212,15 @@ void gammaJetHistProducer(sampleType collision = kPADATA, float photonPtThr=60, 
   tObj[kTrkBkg] = new multiTreeUtil();
 
   float weight=1;
+  bool useOriginalError = false;
   if(collision == kPPDATA && icent!=7)
   {
       weight = 1./100.;    // must account for 100 times smearing during "yskim", but not all pp DATA is smeared.
+      useOriginalError = true;
   }
   if (  ( collision == kHIDATA)   || ( collision==kPADATA) || ( collision == kPPDATA) ) {
-    tObj[kTrkRaw]->addFile(fname,  "yJet",  evtSeltCut,  weight);
-    tObj[kTrkBkg]->addFile(fname,  "mJet",  evtSeltCut,  weight);
+    tObj[kTrkRaw]->addFile(fname,  "yJet",  evtSeltCut,  weight, useOriginalError);
+    tObj[kTrkBkg]->addFile(fname,  "mJet",  evtSeltCut,  weight, useOriginalError);
   }
   else if ( collision == kHIMC ) {
     tObj[kTrkRaw]->addFile(fnameHIMC_AllQcdPho30to50,   "yJet", evtSeltCut, wHIMC_AllQcdPho30to50 ) ;

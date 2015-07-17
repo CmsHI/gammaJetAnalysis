@@ -13,6 +13,7 @@
 #include <TTree.h>
 #include <TChain.h>
 #include <TGraphAsymmErrors.h>
+#include <TString.h>
 #include <iostream>
 #include <TLine.h>
 #include <TMath.h>
@@ -30,6 +31,8 @@
 
 GjSpectra* nullGj;
 
+void gammaJetHistProducer(sampleType collision = kPADATA, float photonPtThr=60, float photonPtThrUp=9999, float jetPtThr=30, int icent =1, TString fname = "", TString outNameSuffix = "");
+
 void gammaTrkSingle(     GjSpectra* gjSpec_=nullGj,
 			 multiTreeUtil* tObj[3]=0,
 			 corrFunctionTrk* corr_=0,
@@ -46,13 +49,19 @@ void gammaTrkSingle(     GjSpectra* gjSpec_=nullGj,
 fitResult getPurity(TString fname="", sampleType collision=kHIDATA, TCut candEvtCut = "", TCut sbEvtCut="", TString ccanvasName="",float photonPtThr=60, float photonPtThrUp=9999);
 
 
-void gammaJetHistProducer(sampleType collision = kPADATA, float photonPtThr=60, float photonPtThrUp=9999, float jetPtThr=30, int icent =1) {
+void gammaJetHistProducer(sampleType collision, float photonPtThr, float photonPtThrUp, float jetPtThr, int icent, TString fname, TString outNameSuffix) {
   TH1::SetDefaultSumw2();
 
   TString stringSampleType = getSampleName(collision); //"";
 
   TDatime* date = new TDatime();
-  TString  outName=  Form("photonTrackCorr_%s_output_photonPtThr%d_to_%d_jetPtThr%d_%d.root",stringSampleType.Data(),(int)photonPtThr, (int)photonPtThrUp, (int)jetPtThr,  date->GetDate());
+  TString  outName;
+  if(outNameSuffix.EqualTo("")) {   // if no explicit suffix for the output file name is specified
+      outName = Form("photonTrackCorr_%s_output_photonPtThr%d_to_%d_jetPtThr%d_%d.root",stringSampleType.Data(),(int)photonPtThr, (int)photonPtThrUp, (int)jetPtThr,  date->GetDate());
+  }
+  else {
+      outName = Form("photonTrackCorr_%s_output_photonPtThr%d_to_%d_jetPtThr%d_%d_%s.root",stringSampleType.Data(),(int)photonPtThr, (int)photonPtThrUp, (int)jetPtThr,  date->GetDate(), outNameSuffix.Data());
+  }
   delete date;
 
   int lowerCent(0),  upperCent(0);
@@ -106,19 +115,21 @@ void gammaJetHistProducer(sampleType collision = kPADATA, float photonPtThr=60, 
     phoCandCut = phoCandCut && "genIso<5 && abs(genMomId)<=22";
 
 
-  TString fname = "";
-  if ( collision == kHIDATA)      fname = fnameHIDATA; //_jetResCorrected;
-  else if ( collision == kPADATA) fname = fnamePADATA;
-  else if ( collision == kPPDATA) {
-    if ( icent == 7 ) fname = fnamePPDATA;
-    else if ( icent == 10010 ) fname = fnamePPDATA0010;
-    else if ( icent == 11030 ) fname = fnamePPDATA1030;
-    else if ( icent == 13050 ) fname = fnamePPDATA3050;
-    else if ( icent == 15099 ) fname = fnamePPDATA5099;
-    else if ( icent == 10030 ) fname = fnamePPDATA0030;
-    else if ( icent == 13099 ) fname = fnamePPDATA30100;
+  if (fname.EqualTo(""))    // if no external yskim File is specified
+  {
+      if ( collision == kHIDATA)      fname = fnameHIDATA; //_jetResCorrected;
+      else if ( collision == kPADATA) fname = fnamePADATA;
+      else if ( collision == kPPDATA) {
+          if ( icent == 7 ) fname = fnamePPDATA;
+          else if ( icent == 10010 ) fname = fnamePPDATA0010;
+          else if ( icent == 11030 ) fname = fnamePPDATA1030;
+          else if ( icent == 13050 ) fname = fnamePPDATA3050;
+          else if ( icent == 15099 ) fname = fnamePPDATA5099;
+          else if ( icent == 10030 ) fname = fnamePPDATA0030;
+          else if ( icent == 13099 ) fname = fnamePPDATA30100;
+      }
+      else fname = "";
   }
-  else fname = "";
 
   multiTreeUtil* tgj = new multiTreeUtil();
   //multiTreeUtil* tgjMC = new multiTreeUtil();
@@ -541,25 +552,46 @@ fitResult getPurity(TString fname, sampleType collision, TCut evtSeltCut, TCut s
 
 int main(int argc, char *argv[])
 {
-  if(argc == 6)
-  {
-    gammaJetHistProducer((sampleType) atoi(argv[1]),
-			 atof(argv[2]),
-			 atof(argv[3]),
-			 atof(argv[4]),
-			 atoi(argv[5]));
-    return 0;
-  }
-  else if(argc == 5)
-  {
-    gammaJetHistProducer((sampleType) atoi(argv[1]),
-             atof(argv[2]),
-             atof(argv[3]),
-             atof(argv[4]));
-    return 0;
-  }
-  else {
-    std::cout << "Wrong number of arguments" << std::endl;
-    return 1;
-  }
+    if(argc == 8)
+    {
+        gammaJetHistProducer((sampleType) atoi(argv[1]),
+                atof(argv[2]),
+                atof(argv[3]),
+                atof(argv[4]),
+                atoi(argv[5]),
+                argv[6],
+                argv[7]);
+        return 0;
+    }
+    else if(argc == 7)
+    {
+        gammaJetHistProducer((sampleType) atoi(argv[1]),
+                atof(argv[2]),
+                atof(argv[3]),
+                atof(argv[4]),
+                atoi(argv[5]),
+                argv[6]);
+        return 0;
+    }
+    else if(argc == 6)
+    {
+        gammaJetHistProducer((sampleType) atoi(argv[1]),
+                atof(argv[2]),
+                atof(argv[3]),
+                atof(argv[4]),
+                atoi(argv[5]));
+        return 0;
+    }
+    else if(argc == 5)
+    {
+        gammaJetHistProducer((sampleType) atoi(argv[1]),
+                atof(argv[2]),
+                atof(argv[3]),
+                atof(argv[4]));
+        return 0;
+    }
+    else {
+        std::cout << "Wrong number of arguments" << std::endl;
+        return 1;
+    }
 }
